@@ -13,6 +13,7 @@ import { WorkerCreateForm } from './components/WorkerCreateForm.tsx';
 import { Layout } from './components/Layout.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { OrgsPage } from './pages/Admin Pages/OrgsPage.tsx';
+import { OrgCreatePage } from './pages/Admin Pages/OrgCreateage.tsx';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/workers/:workerId/assign" element={<ProtectedRoute allowedRoles={['OrgAdmin', 'OrgUser']}><WorkerAssignPage/></ProtectedRoute>}/>
 
         <Route path="/orgs" element={<ProtectedRoute allowedRoles={['GlobalAdmin']}><OrgsPage/></ProtectedRoute>} />
+        <Route path="/orgs/create" element={<ProtectedRoute allowedRoles={['GlobalAdmin']}><OrgCreatePage/></ProtectedRoute>} />
       </Routes>
     </Layout>
   )

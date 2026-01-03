@@ -1,5 +1,6 @@
 import { useQuery } from "react-query"
 import { useNavigate } from "react-router-dom";
+import { useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -16,6 +17,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export function OrgsPage() {
   const navigate = useNavigate();
+  const theme = useTheme();
   const {isLoading,isError,data:orgs,error} = useQuery<OrgResponse[], AxiosError>('orgs',fetchOrgs);
   console.log(orgs);
   
@@ -45,13 +47,13 @@ export function OrgsPage() {
         <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1-content" id="panel1-header">
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <Avatar src={org.logo} alt={org.name} sx={{ width: 56, height: 56 }} />
-                  <Typography variant="h5" component="h2" gutterBottom>
-                    {org.name}
+                  <Typography variant="h6" component="h2" gutterBottom>
+                    <strong>{org.name}</strong>
                   </Typography>                  
           </Box>
         </AccordionSummary>
         <AccordionDetails>
-              <Typography variant="body1" component="p" gutterBottom>
+              <Typography variant="body1" component="p" color={theme.palette.primary.main} gutterBottom>
                     {org.description}
                   </Typography>
         </AccordionDetails>
