@@ -2,22 +2,22 @@ import { useQuery } from "react-query"
 import { useNavigate } from "react-router-dom";
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
-import CardContent from '@mui/material/CardContent'
-import CardActions from '@mui/material/CardActions'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import Alert from '@mui/material/Alert'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
-import { PageContainer, StyledCard } from './OrgsPage.styles.ts'
+import { PageContainer } from './OrgsPage.styles.ts'
 import type { AxiosError } from "axios";
 import type { OrgResponse } from "../../types/org.ts";
-import { Avatar, TableContainer, Paper, Table, TableBody, TableRow, TableCell } from "@mui/material";
+import { Avatar,Accordion,AccordionActions,AccordionSummary,AccordionDetails  } from "@mui/material";
 import { fetchOrgs } from "../../apis/orgsApis.ts";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export function OrgsPage() {
   const navigate = useNavigate();
   const {isLoading,isError,data:orgs,error} = useQuery<OrgResponse[], AxiosError>('orgs',fetchOrgs);
+  console.log(orgs);
   
   if(isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
   if(isError){
@@ -39,40 +39,29 @@ export function OrgsPage() {
         </Button>
       </Box>
 
-      <Box 
-        sx={{ 
-          display:'inline-table'
-        }}
-      >
-        <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-              <TableBody>
-        {orgs?.map((org: OrgResponse) => 
-        <TableRow key={org.OrgId}>
-          <StyledCard>
-             <TableCell >
-              <CardContent>
-                <Box>
-                  <Avatar src={org.Logo} alt={org.Name} sx={{ width: 56, height: 56 }} />
+      <Box>
+      {orgs?.map((org: OrgResponse) => 
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1-content" id="panel1-header">
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Avatar src={org.logo} alt={org.name} sx={{ width: 56, height: 56 }} />
                   <Typography variant="h5" component="h2" gutterBottom>
-                    {org.Name}
+                    {org.name}
+                  </Typography>                  
+          </Box>
+        </AccordionSummary>
+        <AccordionDetails>
+              <Typography variant="body1" component="p" gutterBottom>
+                    {org.description}
                   </Typography>
-                </Box>
-              </CardContent>
-              </TableCell>
-              <TableCell>
-              <CardActions>
-                <Button size="small" onClick={() => navigate(`/orgs/${org.OrgId}`)}>
+        </AccordionDetails>
+        <AccordionActions>
+              <Button size="small" onClick={() => navigate(`/orgs/${org.orgId}`)}>
                   View Details
                 </Button>
-              </CardActions>
-              </TableCell>
-            </StyledCard>
-        </TableRow>
-        )}
-              </TableBody>
-        </Table>
-        </TableContainer>
+        </AccordionActions>
+      </Accordion>
+      )}
       </Box>
 
       <Fab 

@@ -1,8 +1,8 @@
 export interface OrgResponse {
-    OrgId: string;
-    Name: string;
-    Description: string;
-    Logo?: string;
+    orgId: string;
+    name: string;
+    description: string;
+    logo?: string;
 }
 
 
