@@ -24,3 +24,11 @@ export interface User {
         orgId: string;
         userRole: UserRoles;
 }
+
+export interface EditUserForm {
+        Name: string,
+        Email: string,
+        PasswordHash: string,
+        UserName: string,
+        UserRole: UserRoles,
+}

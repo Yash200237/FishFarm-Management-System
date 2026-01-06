@@ -52,6 +52,7 @@ export function FarmEditForm(){
     
     const [farm, setFarm] = useState<FarmSchema>(() => {
         if (data) {
+            console.log("Fetched farm data:", data);
             return {
                 Name: data.name,
                 Longitude: data.longitude,

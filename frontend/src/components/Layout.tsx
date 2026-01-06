@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
@@ -25,6 +25,8 @@ export const Layout = ({ children }: LayoutProps) => {
   const navigate = useNavigate();
   const { mode, toggleTheme } = useThemeMode();
   const { token, handleLogout } = useAuth();
+  const [selected, setSelected] = useState<"farms" | "workers" | "users" | "organizations">();
+
 
   return (
     <>
@@ -37,15 +39,30 @@ export const Layout = ({ children }: LayoutProps) => {
           <AnchorIcon fontSize="large" />
           </Box>
           <NavContainer>
-
               <ProtectedWrapper allowedRoles={['GlobalAdmin']}>
-                <NavButton onClick={() => navigate('/orgs')}>Organizations</NavButton>
-                <NavButton onClick={() => navigate('/users')}>Users</NavButton>
+                <NavButton variant={selected === "organizations" ? "contained" : "text"} onClick={() => {
+                  setSelected("organizations");
+                  navigate('/orgs')}}>Organizations</NavButton>
               </ProtectedWrapper>
 
               <ProtectedWrapper allowedRoles={['OrgAdmin', 'OrgUser']}>
-                <NavButton onClick={() => navigate('/farms')}>Farms</NavButton>
-                <NavButton onClick={() => navigate('/workers')}>Workers</NavButton>
+                <NavButton 
+                  variant={selected === "farms" ? "contained" : "text"} 
+                  onClick={() => {
+                    setSelected("farms");
+                    navigate('/farms')}}>Farms</NavButton>
+                <NavButton 
+                  variant={selected === "workers" ? "contained" : "text"} 
+                  onClick={() => {
+                    setSelected("workers");
+                    navigate('/workers')}}>Workers</NavButton>
+                </ProtectedWrapper>
+                <ProtectedWrapper allowedRoles={['OrgAdmin']}>
+                <NavButton 
+                  variant={selected === "users" ? "contained" : "text"} 
+                  onClick={() => {
+                    setSelected("users");
+                    navigate('/users')}}>Users</NavButton>
               </ProtectedWrapper>
 
               {token == null ? (

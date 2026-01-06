@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CreateOrg } from "../apis/orgsApis";
+import { EditOrg } from "../apis/orgsApis";
 import { useMutation, useQueryClient } from "react-query"
 import { useNavigate } from "react-router-dom";
 import Typography from '@mui/material/Typography'
@@ -12,9 +12,12 @@ import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'
 import { StyledPaper, StyledForm } from './OrgCreateForm.styles'
 import { orgSchema, type OrgSchema } from "../schemas/orgSchemas";
 import { fileToBase64, validateImageFile } from "../utils/file";
+import { useParams } from "react-router-dom";
+import { useQuery } from "react-query";
+import { fetchOrgById } from "../apis/orgsApis";
 
 
-export function OrgsCreateForm(){
+export function OrgsEditForm(){
     type FieldConfig = {
             key: keyof OrgSchema;
             label:string;
@@ -26,22 +29,41 @@ export function OrgsCreateForm(){
         {key:"Logo", label:"Logo",type:"file"},
 
     ]
-    const [org, setOrg] = useState<OrgSchema>({
-        Name: "",
-        Description:"",
-        Logo: "",
-    })
-
     const queryClient = useQueryClient()
     const navigate = useNavigate();
+    const {orgId} = useParams<{orgId: string}>();
+    
+    const {isLoading,isError,data:orgData,error} = useQuery(['orgs',orgId],() => fetchOrgById(orgId!),{ enabled: !!orgId });
+    
     const[errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const createOrgMutation = useMutation(CreateOrg, {
+        
+    const [org, setOrg] = useState<OrgSchema>(() => {
+        if (orgData) {
+            return {
+                Name: orgData.name,
+                Description: orgData.description,
+                Logo: orgData.logo,
+            };
+        }
+        return {
+                Name:"",
+                Description: "",
+                Logo: "",
+        };
+    });
+
+    const editOrgMutation = useMutation(EditOrg, {
         onSuccess: () => {
             queryClient.invalidateQueries("orgs")
             navigate("/orgs");
         },
     })
+    
+    if (!orgId) return <Alert severity="warning">Missing org id</Alert>
+    if(isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
+    if(isError) return <Alert severity="error">{error instanceof Error ? error.message : 'An error occurred'}</Alert>;
+    if(!orgData) return <Alert severity="info">No data available</Alert>;
 
     const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) =>{
         const {name,value} = e.target;
@@ -57,7 +79,12 @@ export function OrgsCreateForm(){
         const result = orgSchema.safeParse(org);
         //console.log("validation result:", result);
         if(result.success){
-            await createOrgMutation.mutateAsync(org);
+            await editOrgMutation.mutateAsync(
+                {
+                orgId: orgId!,
+                org: org,
+                }
+            );
             setOrg({
                 Name: "",
                 Description:"",
@@ -99,12 +126,12 @@ export function OrgsCreateForm(){
                     Create Organization
                 </Typography>
 
-                {createOrgMutation.isLoading && <CircularProgress />}
+                {editOrgMutation.isLoading && <CircularProgress />}
 
-                {createOrgMutation.isError && (
+                {editOrgMutation.isError && (
                     <Alert severity="error">
-                        {createOrgMutation.error instanceof Error
-                            ? createOrgMutation.error.message
+                        {editOrgMutation.error instanceof Error
+                            ? editOrgMutation.error.message
                             : "An error occurred"}
                     </Alert>
                 )}
@@ -148,7 +175,7 @@ export function OrgsCreateForm(){
                 })          
                 }
                 <Button type="submit" variant="contained" fullWidth>
-                    Create Organization
+                    Update Organization
                 </Button>
 
         </StyledForm>

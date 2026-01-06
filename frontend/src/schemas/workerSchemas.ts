@@ -7,7 +7,7 @@ export const workerSchema = z.object({
         Name: z.string().min(1, "Worker Name is required"),
         Age: z.number().min(1),
         Email: z.string().email("Invalid email address"),
-        Picture: z.string().optional(),
+        Picture: z.string().nullable().optional(),
         Phone: z.preprocess(
         (v) => (typeof v === "string" && v.trim() === "" ? null : v),
         z.string().regex(phoneRegex, "Invalid phone number").nullable()
@@ -20,7 +20,7 @@ export const assignSchema = z.object({
         FarmId: z.string().uuid(),
         WorkerId: z.string().uuid(),
         Role: z.enum(["CEO", "Captain", "Worker"]),
-          CertifiedUntil: z
+        CertifiedUntil: z
             .string()
             .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date")
             .refine((s) => {

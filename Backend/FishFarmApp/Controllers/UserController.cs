@@ -93,19 +93,22 @@ namespace FishFarmApp.Controllers
 
         [HttpGet("{id}")]
 
-        public async Task<ActionResult<UserResponseDto>> GetUserById(Guid id) {
-            try { 
-                var user = await _userService.GetUserByIdAsync(id); 
-                return Ok(user); 
-            } 
-            catch (KeyNotFoundException ex){ 
-                _logger.LogError(ex, $"User with ID {id} not found."); 
-                return NotFound(new { message = ex.Message }); 
-            } 
+        public async Task<ActionResult<UserResponseDto>> GetUserById(Guid id)
+        {
+            try
+            {
+                var user = await _userService.GetUserByIdAsync(id);
+                return Ok(user);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogError(ex, $"User with ID {id} not found.");
+                return NotFound(new { message = ex.Message });
+            }
         }
 
         [Authorize(Policy = "RequireOrgAdmin")]
-        [HttpGet]
+        [HttpGet("{orgId}/users")]
 
         public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetAllUsersByOrgId()
         {
@@ -119,7 +122,23 @@ namespace FishFarmApp.Controllers
             return Ok(users);
         }
 
-        [Authorize(Policy = "RequireOrgMember")]
+        [Authorize(Policy = "RequireGlobalAdmin")]
+        [HttpGet("{orgId}/adminusers")]
+        public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetAllAdminUsersByOrgId(Guid orgId)
+        {
+            try
+            {
+                var users = await _userService.GetAdminUsersAsync(orgId);
+                return Ok(users);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogError(ex, $"Admin users with orgID {orgId} not found.");
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+        [Authorize(Policy = "RequireGlobalAdminOrOrgAdmin")]
         [HttpPut("{id}")]
         public async Task<ActionResult<UserResponseDto>> UpdateUser(Guid id,[FromBody] UserDto updateUserDto)
         {
@@ -145,7 +164,7 @@ namespace FishFarmApp.Controllers
             }
         }
 
-        [Authorize(Policy = "RequireOrgMember")]
+        [Authorize(Policy = "RequireGlobalAdminOrOrgAdmin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteUser(Guid id)
         {
@@ -165,8 +184,6 @@ namespace FishFarmApp.Controllers
                 return StatusCode(500, new { message = "Internal server error" });
             }
         }
-
-
 
     }
 }

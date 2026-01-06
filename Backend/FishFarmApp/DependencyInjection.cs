@@ -28,7 +28,12 @@ namespace FishFarmApp
                     policy.RequireRole(UserRoles.OrgAdmin.ToString(),
                                        UserRoles.OrgUser.ToString());
                 });
+                options.AddPolicy("RequireGlobalAdminOrOrgAdmin", policy =>
+                {
+                    policy.RequireRole(UserRoles.GlobalAdmin.ToString(), UserRoles.OrgAdmin.ToString());
+                });
             });
+
             return services;
         }
     }

@@ -9,7 +9,7 @@ export const farmSchema = z.object({
         Latitude: z.number().min(-90).max(90),
         NoOfCages: z.number().min(1),
         HasBarge: z.boolean(),
-        Picture: z.string().optional(),
+        Picture: z.string().nullable().optional(),
         Phone: z.preprocess(
         (v) => (typeof v === "string" && v.trim() === "" ? null : v),
         z.string().regex(phoneRegex, "Invalid phone number").nullable()

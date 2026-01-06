@@ -28,8 +28,8 @@ namespace App.Application.Services
             if (orgDto.Description.Length > 500)
                 throw new ArgumentException("Organization description cannot exceed 500 characters.");
 
-            if (!string.IsNullOrEmpty(orgDto.Logo) && orgDto.Logo.Length > 500)
-                throw new ArgumentException("Organization Logo cannot exceed 500.");
+            //if (!string.IsNullOrEmpty(orgDto.Logo) && orgDto.Logo.Length > 500)
+            //    throw new ArgumentException("Organization Logo cannot exceed 500.");
 
             var org = new Org
             {
@@ -80,8 +80,8 @@ namespace App.Application.Services
             if (updateOrgDto.Description.Length > 500)
                 throw new ArgumentException("Organization description cannot exceed 500 characters.");
 
-            if (!string.IsNullOrEmpty(updateOrgDto.Logo) && updateOrgDto.Logo.Length > 500)
-                throw new ArgumentException("Organization Logo cannot exceed 500.");
+            //if (!string.IsNullOrEmpty(updateOrgDto.Logo) && updateOrgDto.Logo.Length > 500)
+            //    throw new ArgumentException("Organization Logo cannot exceed 500.");
 
             org.Name = updateOrgDto.Name.Trim();
 

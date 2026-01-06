@@ -1,13 +1,14 @@
-import { createContext, useContext, useState, useMemo, useCallback, useEffect } from 'react';
+import { createContext, useContext, useState, useMemo, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { LoginUserForm, User,LoginResponse, UserRoles} from '../types/user';
-import { useMutation } from 'react-query';
-import { loginUser } from '../apis/userApis';
+import {  useMutation, useQuery, useQueryClient } from 'react-query';
+import { GetCurrentUser, loginUser } from '../apis/userApis';
 
 interface AuthContextType {
   token: string | null;
   userRole: UserRoles | null;
   currentUser:User | null;
+  authLoading: boolean;
   isLoading: boolean;
   isError: boolean;
   error: Error | null;
@@ -26,6 +27,7 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const queryClient = useQueryClient();
   const [token, setToken] = useState<string | null>(
     localStorage.getItem('token')
   );
@@ -40,15 +42,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setToken(data.token)
         setCurrentUser({userId: data.userId, name: data.name, email: data.email, userName: data.userName, orgId: data.orgId, userRole: data.userRole});
         setUserRole(data.userRole);
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.userRole);
     },
   })
 
-  useEffect(() => {
-    if (token) localStorage.setItem("token", token);
-    else localStorage.removeItem("token");
-    if (userRole) localStorage.setItem("role", userRole);
-    else localStorage.removeItem("role");
-}, [token, userRole]);
+  const meQuery = useQuery<User, Error>(["me",token], () => GetCurrentUser(),{
+    enabled: !!token,
+    refetchOnMount: "always",
+    retry: false,
+    onSuccess: (user:User) => {
+      setCurrentUser(user);
+      setUserRole(user.userRole as UserRoles);
+      localStorage.setItem("role", user.userRole);
+    },
+    onError: () => {
+        handleLogout()
+    },
+  }
+  );
+
+  const authLoading = !!token && meQuery.isLoading
 
   const handleLogin =useCallback( (user:LoginUserForm) => {
       return mutateAsync(user)  
@@ -60,9 +74,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setToken(null);
     setCurrentUser(null);
     setUserRole(null);
-  }, []);
+    queryClient.removeQueries(["me"])
+  }, [queryClient]);
 
-  const value = useMemo(() => ({ token, userRole, currentUser,isLoading,isError,error, handleLogin,handleLogout }), [token, userRole, currentUser,isLoading,isError,error, handleLogin,handleLogout]);
+  const value = useMemo(() => ({ token, userRole, currentUser,authLoading,isLoading,isError,error, handleLogin,handleLogout }), [token, userRole, currentUser,authLoading,isLoading,isError,error, handleLogin,handleLogout]);
 
   return (
     <AuthContext.Provider value={value}>

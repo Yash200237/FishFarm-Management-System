@@ -27,7 +27,7 @@ export function FarmsPage() {
   return (
     <PageContainer>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h3" component="h1">
+        <Typography variant="h4" component="h1">
           Farms
         </Typography>
         <ProtectedWrapper allowedRoles={['OrgAdmin']}>

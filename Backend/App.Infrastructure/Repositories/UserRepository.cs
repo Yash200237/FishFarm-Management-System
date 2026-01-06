@@ -1,4 +1,5 @@
 ﻿using App.Domain.Entities;
+using App.Domain.Enums;
 using App.Domain.Interfaces;
 using App.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,12 @@ namespace App.Infrastructure.Repositories
         public async Task<IEnumerable<User>> GetAllAsync(Guid orgId)
         {
             return await _context.Users.Where(u => u.OrgId == orgId)
+                .ToListAsync();
+        }
+        
+        public async Task<IEnumerable<User>> GetAllAdminAsync(Guid orgId)
+        {
+            return await _context.Users.Where(u => u.OrgId == orgId && u.UserRole == UserRoles.OrgAdmin)
                 .ToListAsync();
         }
         public async Task<bool> DeleteAsync(Guid userId)

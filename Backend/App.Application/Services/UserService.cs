@@ -125,6 +125,12 @@ namespace App.Application.Services
             return _mapper.Map<IEnumerable<UserResponseDto>>(users);
 
         }
+        public async Task<IEnumerable<UserResponseDto>> GetAdminUsersAsync(Guid orgId)
+        {
+            var users = await _userRepository.GetAllAdminAsync(orgId);
+            return _mapper.Map<IEnumerable<UserResponseDto>>(users);
+
+        }
 
         public async Task<UserResponseDto> UpdateUserAsync(Guid id, UserDto updateUserDto)
         {

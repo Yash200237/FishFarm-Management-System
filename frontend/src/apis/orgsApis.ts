@@ -14,6 +14,7 @@ export async function fetchOrgById(id:string): Promise<OrgResponse> {
 
 export async function CreateOrg(org:OrgSchema): Promise<OrgResponse> {
     const response = await api.post<OrgResponse>(`/Org`, org);
+    console.log("org response:", response.data)
     return response.data;
 }
 

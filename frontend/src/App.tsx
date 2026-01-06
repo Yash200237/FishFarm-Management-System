@@ -13,7 +13,14 @@ import { WorkerCreateForm } from './components/WorkerCreateForm.tsx';
 import { Layout } from './components/Layout.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { OrgsPage } from './pages/Admin Pages/OrgsPage.tsx';
+import { OrgPage } from './pages/Admin Pages/OrgPage.tsx';
 import { OrgCreatePage } from './pages/Admin Pages/OrgCreateage.tsx';
+import { AdminUserCreatePage } from './pages/Admin Pages/AdminUserCreatePage.tsx';
+import { UsersPage } from './pages/UsersPage.tsx';
+import { UserCreatePage } from './pages/UserCreatePage.tsx';
+import { OrgsEditForm } from './components/OrgsEditForm.tsx';
+import { UserEditPage } from './pages/UserEditPage.tsx';
+import { AdminUserEditPage } from './pages/Admin Pages/AdminUserEditPage.tsx';
 
 function App() {
   return (
@@ -34,6 +41,15 @@ function App() {
 
         <Route path="/orgs" element={<ProtectedRoute allowedRoles={['GlobalAdmin']}><OrgsPage/></ProtectedRoute>} />
         <Route path="/orgs/create" element={<ProtectedRoute allowedRoles={['GlobalAdmin']}><OrgCreatePage/></ProtectedRoute>} />
+        <Route path="/orgs/:orgId" element={<ProtectedRoute allowedRoles={['GlobalAdmin']}><OrgPage/></ProtectedRoute>} />
+        <Route path="/orgs/:orgId/edit" element={<ProtectedRoute allowedRoles={['GlobalAdmin']}><OrgsEditForm/></ProtectedRoute>} />
+        <Route path="/orgs/:orgId/users/create" element={<ProtectedRoute allowedRoles={['GlobalAdmin']}><AdminUserCreatePage/></ProtectedRoute>}/>
+        <Route path="/orgs/:orgId/users/edit/:userId" element={<ProtectedRoute allowedRoles={['GlobalAdmin']}><AdminUserEditPage/></ProtectedRoute>}/>
+
+        <Route path="users/" element={<ProtectedRoute allowedRoles={[ 'OrgAdmin']}><UsersPage/></ProtectedRoute>}/>
+        <Route path="users/create/:orgId" element={<ProtectedRoute allowedRoles={['OrgAdmin']}><UserCreatePage/></ProtectedRoute>}/>
+        <Route path="users/:orgId/:userId/edit" element={<ProtectedRoute allowedRoles={['OrgAdmin']}><UserEditPage/></ProtectedRoute>}/>
+
       </Routes>
     </Layout>
   )
