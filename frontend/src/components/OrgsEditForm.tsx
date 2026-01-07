@@ -15,6 +15,7 @@ import { fileToBase64, validateImageFile } from "../utils/file";
 import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 import { fetchOrgById } from "../apis/orgsApis";
+import ButtonGroup from "@mui/material/ButtonGroup";
 
 
 export function OrgsEditForm(){
@@ -174,9 +175,14 @@ export function OrgsEditForm(){
                     }
                 })          
                 }
-                <Button type="submit" variant="contained" fullWidth>
-                    Update Organization
-                </Button>
+                <ButtonGroup fullWidth>
+                        <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
+                            Update Organization
+                        </Button>
+                        <Button type="button" variant="outlined" fullWidth sx={{ mt: 2 }} onClick={() => navigate(-1)}>
+                            Cancel
+                        </Button>
+                </ButtonGroup>
 
         </StyledForm>
        </StyledPaper>

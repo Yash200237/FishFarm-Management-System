@@ -12,6 +12,7 @@ import type { UserSchema } from "../schemas/userSchemas";
 import type { UserRoles } from "../types/user";
 import { userSchema } from "../schemas/userSchemas";
 import Box from "@mui/material/Box";
+import ButtonGroup from "@mui/material/ButtonGroup";
 
 
 
@@ -162,9 +163,14 @@ export function UserEditForm(userRoleProp: {value: UserRoles}){
 
                 {fields.map(renderField)}
                 
-                <Button type="submit" variant="contained" fullWidth>
-                    Update User
-                </Button>
+                <ButtonGroup fullWidth>
+                    <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
+                        Update User
+                    </Button>
+                    <Button type="button" variant="outlined" fullWidth sx={{ mt: 2 }} onClick={() => navigate(-1)}>
+                        Cancel
+                    </Button>
+                </ButtonGroup>
             </StyledForm>
         </StyledPaper>
     )

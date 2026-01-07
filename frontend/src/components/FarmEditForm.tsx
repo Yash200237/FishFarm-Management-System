@@ -17,6 +17,7 @@ import Paper from '@mui/material/Paper'
 import type { FarmSchema } from "../schemas/farmSchemas";
 import { farmSchema } from "../schemas/farmSchemas";
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import { ButtonGroup } from "@mui/material";
 
 
 export function FarmEditForm(){
@@ -200,9 +201,14 @@ export function FarmEditForm(){
                             {errorMessage}
                         </Alert>
                     )}
-                    <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
-                        Save Changes
-                    </Button>
+                    <ButtonGroup fullWidth>
+                        <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
+                            Save Changes
+                        </Button>
+                        <Button type="button" variant="outlined" fullWidth sx={{ mt: 2 }} onClick={() => navigate(-1)}>
+                            Cancel
+                        </Button>
+                    </ButtonGroup>
                 </Box>
             </Paper>
         </Container>

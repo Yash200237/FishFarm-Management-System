@@ -14,6 +14,7 @@ import Container from '@mui/material/Container'
 import Paper from '@mui/material/Paper'
 import MenuItem from '@mui/material/MenuItem'
 import { assignSchema, type AssignSchema } from "../schemas/workerSchemas";
+import ButtonGroup from "@mui/material/ButtonGroup";
 
 export const WorkerAssignPage = () => {
     const {workerId} = useParams<{workerId: string}>();
@@ -100,18 +101,23 @@ export const WorkerAssignPage = () => {
                     InputLabelProps={{ shrink: true }}
                     fullWidth
                 />
-
-                <Button 
-                    variant="contained"
-                    disabled={!assignWorker.FarmId || createAssignmentMutation.isLoading}
-                    onClick={() => {
-                        handleOnClick();
-                    }
-                    }
-                    fullWidth
-                >
-                    {createAssignmentMutation.isLoading ? 'Assigning...' : 'Assign to Farm'}
-                </Button>
+                <ButtonGroup fullWidth>
+                        <Button 
+                            variant="contained"
+                            disabled={!assignWorker.FarmId || createAssignmentMutation.isLoading}
+                            onClick={() => {
+                                handleOnClick();
+                            }
+                            }
+                            fullWidth
+                            sx={{ mt: 2 }}
+                        >
+                            {createAssignmentMutation.isLoading ? 'Assigning...' : 'Assign to Farm'}
+                        </Button>
+                        <Button type="button" variant="outlined" fullWidth sx={{ mt: 2 }} onClick={() => navigate('/workers')}>
+                            Skip for later
+                        </Button>
+                </ButtonGroup>
             </Box>
         </Paper>
     </Container>
