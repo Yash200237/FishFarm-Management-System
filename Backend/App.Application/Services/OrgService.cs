@@ -1,15 +1,19 @@
-﻿using App.Application.Interfaces;
-using App.Application.DTOs;
+﻿using App.Application.DTOs;
+using App.Application.Interfaces;
 using App.Domain.Entities;
 using App.Domain.Interfaces;
 using AutoMapper;
+using System.Linq;
 
 namespace App.Application.Services
 {
-    public class OrgService(IOrgRepository orgRepository, IMapper mapper) : IOrgService
+    public class OrgService(IOrgRepository orgRepository,IFarmRepository farmRepository,IWorkerRepository workerRepository,IUserRepository userRepository, IMapper mapper) : IOrgService
     {
         private readonly IOrgRepository _orgRepository = orgRepository;
         private readonly IMapper _mapper = mapper;
+        private readonly IFarmRepository _farmRepository = farmRepository;
+        private readonly IWorkerRepository _workerRepository = workerRepository;
+        private readonly IUserRepository _userRepository = userRepository;
 
         public async Task<OrgResponseDto> CreateOrgAsync(OrgDto orgDto)
         {
@@ -96,6 +100,20 @@ namespace App.Application.Services
 
         public async Task DeleteOrgAsync(Guid id)
         {
+            var farms = await _farmRepository.GetAllAsync(id);
+            if (farms.Any()) {
+                throw new ArgumentException("Organization have existing farms.");
+            }
+            var workers = await _workerRepository.GetAllAsync(id);
+            if (workers.Any())
+            {
+                throw new ArgumentException("Organization have existing worker.");
+            }
+            var users = await _userRepository.GetAllAsync(id);
+            if (users.Any())
+            {
+                throw new ArgumentException("Organization have existing users.");
+            }
             var deleted = await _orgRepository.DeleteAsync(id);
             if(!deleted)
                 throw new KeyNotFoundException($"Organization with ID {id} not found.");    

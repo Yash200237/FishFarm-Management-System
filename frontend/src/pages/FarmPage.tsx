@@ -18,6 +18,8 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { PageContainer, DetailCard, InfoSection, WorkerListItem } from './FarmPage.styles'
 import { ProtectedWrapper } from "../components/ProtectedWrapper";
+import { DeleteAlertDialog } from "../components/DeleteAlertDialog";
+import { useState } from "react";
 
 export const FarmPage = () => {
     const {farmId} = useParams<{farmId: string}>();
@@ -33,6 +35,10 @@ export const FarmPage = () => {
       navigate("/farms")
     },
     })
+    const [open,setOpen] = useState(false);
+    const [openWorker,setOpenWorker] = useState(false);
+    const [dialogWorkerId, setDialogWorkerId] = useState<string | null>(null);
+    const [dialogFarmId, setDialogFarmId] = useState<string | null>(null);
 
     const {isLoading:isWorkersLoading,isError:isWorkersError,data:workers} = useQuery(['farm_workers',farmId],() => fetchWorkerByFarmId(farmId!),{ enabled: !!farmId });
 
@@ -42,6 +48,16 @@ export const FarmPage = () => {
       },
     })
 
+    const handleClickOpen = () => {
+      setOpen(true);
+    }
+
+    const handleClickOpenWorker = (workerId: string, farmId: string) => {
+      setDialogWorkerId(workerId);
+      setDialogFarmId(farmId);
+      setOpenWorker(true);
+    }
+
     if (!farmId) return <Alert severity="warning">Missing farm id</Alert>;
     if(isLoading || isWorkersLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
     if(isError || isWorkersError) return <Alert severity="error">{error instanceof Error ? error.message : 'An error occurred'}</Alert>;
@@ -49,6 +65,29 @@ export const FarmPage = () => {
 
     return (
       <PageContainer>
+        {open && DeleteAlertDialog(
+          open,
+          "this farm.? All associated workers of this farm will be unassigned.",
+          () => {
+            deleteFarmMutation.mutate(farmId);
+            setOpen(false);
+
+          },
+          () => {
+            setOpen(false);
+          }
+        )}        
+        {openWorker && DeleteAlertDialog(
+          openWorker,
+          "this worker assignment?.",
+          () => {
+            removeWorkerFromFarmMutation.mutate({ workerId: dialogWorkerId!, farmId: dialogFarmId! });
+            setOpenWorker(false);
+          },
+          () => {
+            setOpenWorker(false);
+          }
+        )}
         <DetailCard>
           <Typography variant="h3" component="h1" gutterBottom>
             {farm.name}
@@ -100,9 +139,7 @@ export const FarmPage = () => {
                         size="small"
                         color="error"
                         disabled={removeWorkerFromFarmMutation.isLoading}
-                        onClick={() =>
-                          removeWorkerFromFarmMutation.mutate({ workerId: worker.workerId, farmId: farm.farmId })
-                        }
+                        onClick={() =>handleClickOpenWorker(worker.workerId, farm.farmId)}
                       >
                         {removeWorkerFromFarmMutation.isLoading ? "Removing..." : "Remove"}
                       </Button>
@@ -144,7 +181,7 @@ export const FarmPage = () => {
             <Button 
               color="error"
               startIcon={<DeleteIcon />}
-              onClick={() => deleteFarmMutation.mutate(farmId!)}
+              onClick={() => handleClickOpen()}
             >
               Delete
             </Button>

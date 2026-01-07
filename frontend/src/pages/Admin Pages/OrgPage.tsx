@@ -19,6 +19,8 @@ import { PageContainer, DetailCard, InfoSection, UserListItem } from './OrgPage.
 import { ProtectedWrapper } from "../../components/ProtectedWrapper.tsx";
 import type { User } from "../../types/user.ts";
 import Grid from '@mui/material/Grid';
+import { useState } from "react";
+import { DeleteAlertDialog } from "../../components/DeleteAlertDialog";
 
 
 export const OrgPage = () => {
@@ -49,13 +51,48 @@ export const OrgPage = () => {
       }
     })
 
+    const [open,setOpen] = useState(false);
+    const [dialogUserId, setDialogUserId] = useState<string | null>(null);
+    const [openOrg,setOpenOrg] = useState(false);
+
     if (!orgId) return <Alert severity="warning">Missing org id</Alert>;
     if(isLoading || isUsersLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
     if(isError || isUsersError) return <Alert severity="error">{error instanceof Error ? error.message : 'An error occurred'}</Alert>;
     if(!org || !users) return <Alert severity="info">No data available</Alert>;
 
+    const handleClickOpen = (userId: string) => {
+      setDialogUserId(userId);
+      setOpen(true);
+    }
+
+    const handleOrgClickOpen = () => {
+      setOpenOrg(true);
+    }
+
     return (
       <PageContainer>
+        {open && DeleteAlertDialog(
+          open,
+          "this admin user.?",
+          () => {
+            removeUserMutation.mutate(dialogUserId!);
+            setOpen(false);
+          },
+          () => {
+            setOpen(false);
+          }
+        )}
+        {openOrg && DeleteAlertDialog(
+          openOrg,
+          "this organization? All associated farms, workers and users will be removed.",
+          () => {
+            deleteOrgMutation.mutate(orgId!);
+            setOpenOrg(false);
+          },
+          () => {
+            setOpenOrg(false);
+          }
+        )}
         <Grid container spacing={3}>
           <Grid size={6}>
           <DetailCard>
@@ -88,7 +125,7 @@ export const OrgPage = () => {
             <Button 
               color="error"
               startIcon={<DeleteIcon />}
-              onClick={() => deleteOrgMutation.mutate(orgId!)}
+              onClick={() => handleOrgClickOpen()}
             >
               Delete
             </Button>
@@ -132,9 +169,7 @@ export const OrgPage = () => {
                         size="small"
                         color="error"
                         disabled={removeUserMutation.isLoading}
-                        onClick={ () =>
-                          removeUserMutation.mutate(user.userId)
-                        }
+                        onClick={() => handleClickOpen(user.userId)}
                       >
                         {removeUserMutation.isLoading ? "Removing..." : "Remove"}
                       </Button>

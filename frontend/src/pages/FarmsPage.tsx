@@ -40,7 +40,10 @@ export function FarmsPage() {
         </Button>
         </ProtectedWrapper>
       </Box>
-
+      {
+        farms?.length === 0 &&
+        <Alert severity="info">No farms available. Please create a new farm.</Alert>
+      }
       <Box 
         sx={{ 
           display: 'grid', 

@@ -14,11 +14,13 @@ import { ProtectedWrapper } from "../components/ProtectedWrapper.tsx";
 import type { User } from "../types/user.ts";
 import { GetUsersByOrgId } from "../apis/userApis.ts";
 import { useMemo } from "react";
-import { useAuth } from "../contexts/AuthProviderContext.tsx";
+import { useAuth } from "../contexts/AuthProviderHook.ts";
 import { useMutation, useQueryClient } from "react-query"
 import { DeleteUser } from "../apis/userApis.ts";
 import {Table,TableHead,TableRow,TableCell,TableBody, TableContainer, List, ListItem, ListItemText, Chip} from '@mui/material';
 import Paper from '@mui/material/Paper';
+import { useState } from "react";
+import { DeleteAlertDialog } from "../components/DeleteAlertDialog";
 
 
 export function UsersPage() {
@@ -27,6 +29,9 @@ export function UsersPage() {
   const { currentUser } = useAuth();
   const orgId = currentUser?.orgId;
   console.log("Org ID in UsersPage:", orgId);
+
+  const [open,setOpen] = useState(false);
+  const [dialogUserId, setDialogUserId] = useState<string | null>(null);
   
   const {isLoading,isError,data:users,error} = useQuery<User[], AxiosError>(['users', orgId], async () => 
     await GetUsersByOrgId(orgId!)
@@ -56,8 +61,24 @@ export function UsersPage() {
      return <Alert severity="error">{error instanceof Error ? error?.response?.status === 401 ? 'Please login to continue' : error.message : 'An error occurred'}</Alert>;
   }
 
+  const handleClickOpen = (userId: string) => {
+      setDialogUserId(userId);
+      setOpen(true);
+  }
+
   return (
     <PageContainer>
+      {DeleteAlertDialog(
+        open,
+        "this user.?",
+        () =>{
+              removeUserMutation.mutate(dialogUserId!);
+              setOpen(false);
+        },
+        () => {
+          setOpen(false);
+        }
+      )}
       <ProtectedWrapper allowedRoles={['OrgAdmin']}>
           <Typography variant="h4" gutterBottom>
             Admin Users
@@ -101,7 +122,10 @@ export function UsersPage() {
         </Button>
       </Box>
 
-        <TableContainer component={Paper} sx={{maxHeight: 350, mt:4}}>
+      { org_users?.length === 0 ? (
+        <Alert severity="info">No users available. Please create a new user.</Alert>
+      ) : (
+      <TableContainer component={Paper} sx={{maxHeight: 350, mt:4}}>
             <Table aria-label="users table" stickyHeader>
               <TableHead>
                 <TableRow>
@@ -131,9 +155,7 @@ export function UsersPage() {
                       size="small"
                       color="error"
                       disabled={removeUserMutation.isLoading}
-                      onClick={() =>
-                        removeUserMutation.mutate(user.userId)
-                      }
+                      onClick={() => handleClickOpen(user.userId)}
                     >
                       {removeUserMutation.isLoading ? "Removing..." : "Remove"}
                     </Button>
@@ -144,7 +166,8 @@ export function UsersPage() {
               </TableBody>
             </Table>
         </TableContainer>
-
+      )
+    }
 
 
 

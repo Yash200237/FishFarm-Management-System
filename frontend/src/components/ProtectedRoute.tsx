@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 import type { UserRoles } from "../types/user.ts";
-import { useAuth } from "../contexts/AuthProviderContext.tsx";
+import { useAuth } from "../contexts/AuthProviderHook.ts";
 import { Alert } from "@mui/material";
 
 type ProtectedRouteProps = PropsWithChildren & {

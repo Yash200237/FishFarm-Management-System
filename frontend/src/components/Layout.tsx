@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-import { useThemeMode } from '../contexts/ThemeContext';
+import { useThemeMode } from '../contexts/ThemeHook';
 import {
   StyledAppBar,
   StyledToolbar,
@@ -12,7 +12,7 @@ import {
   ThemeToggleButton,
   MainContent,
 } from './Layout.styles';
-import { useAuth } from '../contexts/AuthProviderContext';
+import { useAuth } from '../contexts/AuthProviderHook';
 import AnchorIcon from '@mui/icons-material/Anchor';
 import Box from '@mui/material/Box';
 import { ProtectedWrapper } from './ProtectedWrapper';

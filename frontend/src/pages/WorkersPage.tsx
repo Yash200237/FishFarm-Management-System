@@ -88,6 +88,10 @@ export function WorkersPage() {
       <Typography variant="h5" gutterBottom sx={{ mt: 3 }}>
         All Workers
       </Typography>
+      {
+        workers?.length === 0 &&
+        <Alert severity="info">No workers available. Please create a new worker.</Alert>
+      }
       <Box 
         sx={{ 
           display: 'grid', 

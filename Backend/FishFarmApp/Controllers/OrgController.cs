@@ -97,6 +97,11 @@ namespace FishFarmApp.Controllers
                 _logger.LogError(ex, $"Organization with ID {id} not found.");
                 return NotFound(new { message = ex.Message });
             }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "Validation error while deleting organization.");
+                return BadRequest(new { message = ex.Message });
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while deleting organization.");

@@ -1,24 +1,10 @@
-import { createContext, useContext, useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { lightTheme, darkTheme } from '../theme/theme';
+import { ThemeModeContext } from './ThemeHook';
+import type { ThemeMode } from './ThemeHook';
 
-type ThemeMode = 'light' | 'dark';
-
-interface ThemeModeContextType {
-  mode: ThemeMode;
-  toggleTheme: () => void;
-}
-
-const ThemeModeContext = createContext<ThemeModeContextType | undefined>(undefined);
-
-export const useThemeMode = () => {
-  const context = useContext(ThemeModeContext);
-  if (!context) {
-    throw new Error('useThemeMode must be used within ThemeModeProvider');
-  }
-  return context;
-};
 
 export const ThemeModeProvider = ({ children }: { children: ReactNode }) => {
   const [mode, setMode] = useState<ThemeMode>(() => {

@@ -19,6 +19,8 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EmailIcon from '@mui/icons-material/Email'
 import PhoneIcon from '@mui/icons-material/Phone'
 import { PageContainer, ProfileCard, ProfileHeader, StyledAvatar, InfoSection, FarmListItem } from './WorkerPage.styles'
+import { useState } from "react";
+import { DeleteAlertDialog } from "../components/DeleteAlertDialog";
 
 export const WorkerPage = () => {
     const {workerId} = useParams<{workerId: string}>();
@@ -35,6 +37,8 @@ export const WorkerPage = () => {
       },
     })
 
+    const [open,setOpen] = useState(false);
+    
     const {isLoading:isFarmsLoading,isError:isFarmsError,data:farms} = useQuery(['worker_farms',workerId],() => fetchFarmByworkerId(workerId!),{ enabled: !!workerId });
 
     const removeWorkerFromFarmMutation = useMutation(({workerId, farmId}: {workerId: string; farmId: string}) => removeWorkerFromFarm(workerId, farmId), {
@@ -50,9 +54,21 @@ export const WorkerPage = () => {
     if(isError || isFarmsError) return <Alert severity="error">{error instanceof Error ? error.message : 'An error occurred'}</Alert>;
     if (!worker || !farms) return <Alert severity="info">No data available</Alert>;
 
+    const handleClickOpen = () => {
+      setOpen(true);
+    }
 
     return (
       <PageContainer>
+        {DeleteAlertDialog(
+          open,
+          "this worker.? Worker will be removed from all assigned farms.",
+          () => {
+            deleteWorkerMutation.mutate(worker.workerId!);
+            setOpen(false);
+          },
+          () => {setOpen(false);}
+        )}
         <ProfileCard>
           <ProfileHeader>
             <StyledAvatar src={worker.picture} alt={worker.name} />
@@ -138,7 +154,7 @@ export const WorkerPage = () => {
             <Button 
               color="error"
               startIcon={<DeleteIcon />}
-              onClick={() => deleteWorkerMutation.mutate(worker.workerId!)}
+              onClick={() => handleClickOpen()}
             >
               Delete
             </Button>

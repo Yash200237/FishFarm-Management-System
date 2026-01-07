@@ -1,30 +1,10 @@
-import { createContext, useContext, useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { LoginUserForm, User,LoginResponse, UserRoles} from '../types/user';
 import {  useMutation, useQuery, useQueryClient } from 'react-query';
 import { GetCurrentUser, loginUser } from '../apis/userApis';
+import {AuthContext} from './AuthProviderHook';
 
-interface AuthContextType {
-  token: string | null;
-  userRole: UserRoles | null;
-  currentUser:User | null;
-  authLoading: boolean;
-  isLoading: boolean;
-  isError: boolean;
-  error: Error | null;
-  handleLogin: (user:LoginUserForm) => Promise<LoginResponse>;
-  handleLogout: () => void;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
-  return context;
-};
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
