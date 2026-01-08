@@ -10,7 +10,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import { StyledPaper, StyledForm } from './UserCreateForm.styles'
 import type { UserSchema } from "../schemas/userSchemas";
 import type { UserRoles } from "../types/user";
-import { userSchema } from "../schemas/userSchemas";
+import { userEditSchema } from "../schemas/userSchemas";
 import Box from "@mui/material/Box";
 import ButtonGroup from "@mui/material/ButtonGroup";
 
@@ -89,7 +89,7 @@ export function UserEditForm(userRoleProp: {value: UserRoles}){
 
     const handleSubmit =async (e: React.FormEvent<HTMLFormElement>) =>{
         e.preventDefault();
-        const result = userSchema.safeParse(user);
+        const result = userEditSchema.safeParse(user);
         if(result.success){
             await editUserMutation.mutateAsync({userId: userId!, user: 
                 {

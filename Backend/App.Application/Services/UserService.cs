@@ -132,7 +132,7 @@ namespace App.Application.Services
 
         }
 
-        public async Task<UserResponseDto> UpdateUserAsync(Guid id, UserDto updateUserDto)
+        public async Task<UserResponseDto> UpdateUserAsync(Guid id, EditUserDto updateUserDto)
         {
             if (updateUserDto == null)
                 throw new ArgumentNullException(nameof(updateUserDto));
@@ -160,10 +160,10 @@ namespace App.Application.Services
             if (updateUserDto.UserName.Length > 50)
                 throw new ArgumentException("UserName cannot exceed 50 characters.");
 
-            if (string.IsNullOrWhiteSpace(updateUserDto.PasswordHash))
-                throw new ArgumentException("Password hash is required.");
+            //if (string.IsNullOrWhiteSpace(updateUserDto.PasswordHash))
+            //    throw new ArgumentException("Password hash is required.");
 
-            if (updateUserDto.PasswordHash.Length > 255)
+            if (updateUserDto.PasswordHash != null && updateUserDto.PasswordHash.Length > 255)
                 throw new ArgumentException("Hashed password cannot exceed 255 characters.");
 
             var existingByEmail = await _userRepository.GetByEmailUsernameAsync(updateUserDto.Email);
@@ -178,7 +178,9 @@ namespace App.Application.Services
 
             user.Email = updateUserDto.Email;
 
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updateUserDto.PasswordHash);
+            if (updateUserDto.PasswordHash != null){
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(updateUserDto.PasswordHash);
+            }
 
             user.UserName = updateUserDto.UserName;
 

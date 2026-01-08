@@ -140,7 +140,7 @@ namespace FishFarmApp.Controllers
 
         [Authorize(Policy = "RequireGlobalAdminOrOrgAdmin")]
         [HttpPut("{id}")]
-        public async Task<ActionResult<UserResponseDto>> UpdateUser(Guid id,[FromBody] UserDto updateUserDto)
+        public async Task<ActionResult<UserResponseDto>> UpdateUser(Guid id,[FromBody] EditUserDto updateUserDto)
         {
             try
             {
