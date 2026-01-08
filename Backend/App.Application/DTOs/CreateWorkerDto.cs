@@ -1,6 +1,5 @@
 ﻿namespace App.Application.DTOs
 {
-    // Renamed to avoid duplicate definition error CS0101
     public class CreateWorkerDto
     {
         public string Name { get; set; } = null!;

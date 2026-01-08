@@ -1,6 +1,4 @@
-﻿using App.Domain.Entities;
-
-namespace App.Application.DTOs
+﻿namespace App.Application.DTOs
 {
     public class OrgDto
     {

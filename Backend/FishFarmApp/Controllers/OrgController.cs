@@ -1,7 +1,6 @@
 ﻿using App.Application.Interfaces;
 using App.Application.DTOs;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FishFarmApp.Controllers

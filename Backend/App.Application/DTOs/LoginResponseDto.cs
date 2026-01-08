@@ -1,5 +1,4 @@
-﻿using App.Domain.Entities;
-using App.Domain.Enums;
+﻿using App.Domain.Enums;
 
 namespace App.Application.DTOs
 {

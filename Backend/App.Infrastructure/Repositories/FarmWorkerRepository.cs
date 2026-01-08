@@ -1,5 +1,4 @@
-﻿using App.Application.DTOs;
-using App.Domain.Entities;
+﻿using App.Domain.Entities;
 using App.Domain.Interfaces;
 using App.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -30,13 +29,6 @@ namespace App.Infrastructure.Repositories
         {
             return await _context.FarmWorkers
                     .Where(fw => fw.WorkerId == workerId)
-                    //.Select(fw => new FarmWDetailsDto
-                    //{
-                    //    FarmId = fw.FarmId,
-                    //    FarmName = fw.Farm.Name,
-                    //    Role = fw.Role,
-                    //    CertifiedUntil = fw.CertifiedUntil
-                    //})
                     .Include(fw => fw.Farm)
                     .ToListAsync();
         }
@@ -45,15 +37,6 @@ namespace App.Infrastructure.Repositories
             return await _context.FarmWorkers
                     .Where(fw => fw.FarmId == farmId)
                     .Include(fw => fw.Worker)
-
-                    //.Select(fw => new FarmWorkerDetailsDto
-                    //{
-                    //    WorkerId = fw.WorkerId,
-                    //    WorkerName = fw.Worker.Name,
-                    //    WorkerEmail = fw.Worker.Email,
-                    //    Role = fw.Role,
-                    //    CertifiedUntil = fw.CertifiedUntil
-                    //})
                     .ToListAsync();
         }
 

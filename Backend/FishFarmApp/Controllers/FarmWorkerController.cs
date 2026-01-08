@@ -1,12 +1,7 @@
-﻿ using App.Application.Interfaces;
-using App.Application.Services;
+﻿using App.Application.Interfaces;
 using App.Application.DTOs;
-using App.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Security.Cryptography;
 
 namespace FishFarmApp.Controllers
 {

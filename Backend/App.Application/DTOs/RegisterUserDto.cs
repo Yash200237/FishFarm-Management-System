@@ -1,5 +1,4 @@
-﻿using App.Domain.Entities;
-using App.Domain.Enums;
+﻿using App.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace App.Application.DTOs

@@ -1,7 +1,4 @@
-﻿using App.Domain.Entities;
-using App.Domain.Enums;
-
-namespace App.Application.DTOs
+﻿namespace App.Application.DTOs
 {
     public class LoginDto
     {
