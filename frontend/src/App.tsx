@@ -34,7 +34,7 @@ function App() {
         <Route path="/farms/create" element={<ProtectedRoute allowedRoles={['OrgAdmin']}><FarmCreatePage/></ProtectedRoute>}/>
         <Route path="/farms/:farmId" element={<ProtectedRoute allowedRoles={['OrgAdmin', 'OrgUser']}><FarmPage/></ProtectedRoute>}/>
         <Route path="/farms/:farmId/edit" element={<ProtectedRoute allowedRoles={['OrgAdmin']}><FarmEditForm/></ProtectedRoute>}/>
-        <Route path="/farms/:farmId/workers/assign" element={<ProtectedRoute allowedRoles={['OrgAdmin']}><FarmWorkerAssignPage/></ProtectedRoute>}/>
+        <Route path="/farms/:farmId/workers/assign" element={<ProtectedRoute allowedRoles={['OrgAdmin','OrgUser']}><FarmWorkerAssignPage/></ProtectedRoute>}/>
         <Route path="/farms/:farmId/workers/:workerId/edit" element={<ProtectedRoute allowedRoles={['OrgAdmin']}><WorkerAssignEditPage/></ProtectedRoute>}/>
 
         <Route path="/workers" element={<ProtectedRoute allowedRoles={['OrgAdmin', 'OrgUser']}><WorkersPage/></ProtectedRoute>}/>
