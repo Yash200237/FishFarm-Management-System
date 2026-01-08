@@ -1,45 +1,40 @@
-import { useMutation, useQuery } from "react-query";
+import { useMutation } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
-import { assignWorkerToFarm, fetchWorkersNotAssigned } from "../apis/wokersApis";
 import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Alert from '@mui/material/Alert'
-import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Paper from '@mui/material/Paper'
 import MenuItem from '@mui/material/MenuItem'
 import { assignSchema, type AssignSchema } from "../schemas/workerSchemas";
 import ButtonGroup from "@mui/material/ButtonGroup";
-import type { WorkerResponse } from "../types/worker";
+import { updateWorkerToFarm } from "../apis/wokersApis";
 
-export const FarmWorkerAssignPage = () => {
+export const WorkerAssignEditPage = () => {
+    const {workerId} = useParams<{workerId: string}>();
     const {farmId} = useParams<{farmId: string}>();
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [assignWorker, setAssignWorker] = useState<AssignSchema>({
-        WorkerId: "",
+        WorkerId: workerId || "",
         FarmId: farmId || "",
         Role: "Worker",
         CertifiedUntil: new Date().toISOString().split('T')[0],
     });
-    const createAssignmentMutation = useMutation(assignWorkerToFarm, {
+    const updateAssignmentMutation = useMutation(updateWorkerToFarm, {
         onSuccess: () => {
-            navigate(`/farms/${farmId}`)
-
+            navigate(-1)
         },
     })  
-    const {isLoading,isError,data:workers,error} = useQuery('workers', () => fetchWorkersNotAssigned(farmId!));
-    if (!farmId) return <Alert severity="warning">Missing farm id</Alert>
-    if(isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
-    if(isError) return <Alert severity="error">{error instanceof Error ? error.message : 'An error occurred'}</Alert>;      
+    if (!workerId) return <Alert severity="warning">Missing worker id</Alert>    
 
     const handleOnClick = () => {
         const result = assignSchema.safeParse(assignWorker);
         if(result.success){
-            createAssignmentMutation.mutate(assignWorker)}
+            updateAssignmentMutation.mutate(assignWorker)}
         else {
             setErrorMessage(result.error.issues[0].path + " : " + result.error.issues[0].message);
         }
@@ -75,22 +70,6 @@ export const FarmWorkerAssignPage = () => {
                 </TextField>
 
                 <TextField
-                    select
-                    label="Select Worker"
-                    value={assignWorker.WorkerId}
-                    onChange={(e) =>
-                        setAssignWorker((prev) => ({ ...prev, WorkerId: e.target.value }))
-                    }
-                    fullWidth
-                    required
-                >
-                    <MenuItem value="">-- Select a worker --</MenuItem>
-                    {workers?.map((worker: WorkerResponse) => (
-                        <MenuItem key={worker.workerId} value={worker.workerId}>{worker.name}</MenuItem>
-                    ))}
-                </TextField>
-
-                <TextField
                     type="date"
                     label="Certified Until"
                     value={assignWorker.CertifiedUntil}
@@ -103,7 +82,7 @@ export const FarmWorkerAssignPage = () => {
                 <ButtonGroup fullWidth>
                         <Button 
                             variant="contained"
-                            disabled={!assignWorker.FarmId || createAssignmentMutation.isLoading}
+                            disabled={!assignWorker.FarmId || updateAssignmentMutation.isLoading}
                             onClick={() => {
                                 handleOnClick();
                             }
@@ -111,10 +90,10 @@ export const FarmWorkerAssignPage = () => {
                             fullWidth
                             sx={{ mt: 2 }}
                         >
-                            {createAssignmentMutation.isLoading ? 'Assigning...' : 'Assign to Farm'}
+                            {updateAssignmentMutation.isLoading ? 'Updating...' : 'Update Assignment'}
                         </Button>
-                        <Button type="button" variant="outlined" fullWidth sx={{ mt: 2 }} onClick={() => navigate(`/farms/${farmId}`)}>
-                            Skip for later
+                        <Button type="button" variant="outlined" fullWidth sx={{ mt: 2 }} onClick={() => navigate(-1)}>
+                            Cancel
                         </Button>
                 </ButtonGroup>
             </Box>

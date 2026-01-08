@@ -37,6 +37,11 @@ export async function assignWorkerToFarm(payload: AssignSchema): Promise<AssignW
   return response.data;
 }
 
+export async function updateWorkerToFarm(payload: AssignSchema): Promise<AssignWorkerForm> {
+  const response = await api.patch<AssignSchema>("/FarmWorker", payload);
+  return response.data;
+}
+
 export async function fetchWorkerByFarmId(farmId:string):Promise<FarmWorkerDetails[]>{
     const response = await api.get<FarmWorkerDetails[]>(`/FarmWorker/farm/${farmId}/workers`);
     return response.data;

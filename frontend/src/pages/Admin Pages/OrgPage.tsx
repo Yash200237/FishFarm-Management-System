@@ -21,12 +21,14 @@ import type { User } from "../../types/user.ts";
 import Grid from '@mui/material/Grid';
 import { useState } from "react";
 import { DeleteAlertDialog } from "../../components/DeleteAlertDialog";
+import type { AxiosError } from "axios";
 
 
 export const OrgPage = () => {
     const {orgId} = useParams<{orgId: string}>();
     const navigate = useNavigate();
     const queryClient = useQueryClient()
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     console.log("Org ID:", orgId);
     const {isLoading,isError,data:org,error} = useQuery(['orgs',orgId],() => fetchOrgById(orgId!),{ enabled: !!orgId });
     const deleteOrgMutation = useMutation(DeleteOrg, {
@@ -36,17 +38,21 @@ export const OrgPage = () => {
         queryClient.invalidateQueries("orgs")
         navigate("/orgs")
       },
+      onError: (error: AxiosError) => {
+        const errorData = error.response?.data as { message?: string };
+        setErrorMessage(errorData?.message || "An error occurred while deleting the organization.");
+      }
     })
 
     const {isLoading:isUsersLoading,isError:isUsersError,data:users} = useQuery<User[]>(['org_users',orgId],() => GetAdminUsersByOrgId(orgId!),
     { enabled: !!orgId });
     console.log("users value:", users)
     console.log("isArray:", Array.isArray(users))
-    const removeUserMutation = useMutation((userId: string) => DeleteUser(userId), {
+    const removeUserMutation = useMutation<void, AxiosError, string>((userId: string) => DeleteUser(userId), {
       onSuccess: () => {
         queryClient.invalidateQueries(['org_users', orgId])
       },
-      onError: (error) => {
+      onError: (error: AxiosError) => {
         console.error("Error removing user:", error);
       }
     })
@@ -71,6 +77,11 @@ export const OrgPage = () => {
 
     return (
       <PageContainer>
+        {errorMessage && (
+          <Alert severity="error" onClose={() => setErrorMessage(null)} sx={{ mb: 2 }}>
+            {"You Cannot delete organization with existing farms, workers or users. This " + errorMessage}
+          </Alert>
+        )}
         {open && DeleteAlertDialog(
           open,
           "this admin user.?",
@@ -84,7 +95,7 @@ export const OrgPage = () => {
         )}
         {openOrg && DeleteAlertDialog(
           openOrg,
-          "this organization? All associated farms, workers and users will be removed.",
+          "this organization?",
           () => {
             deleteOrgMutation.mutate(orgId!);
             setOpenOrg(false);

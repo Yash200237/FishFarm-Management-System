@@ -139,11 +139,16 @@ export const FarmPage = () => {
                   key={worker.workerId}
                   secondaryAction={
                     <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Button
+                        size="small"
+                        onClick={() => navigate(`/farms/${farm.farmId}/workers/${worker.workerId}/edit`)}>
+                        Edit
+                      </Button>
                       <Button 
                         size="small" 
                         onClick={() => navigate(`/workers/${worker.workerId}`)}
                       >
-                        View
+                        View Worker
                       </Button>
                       <Button
                         size="small"
