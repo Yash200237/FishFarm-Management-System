@@ -169,41 +169,6 @@ export function UsersPage() {
       )
     }
 
-
-
-      {/* <Box 
-        sx={{ 
-          display: 'grid', 
-          gridTemplateColumns: { 
-            xs: '1fr', 
-            sm: 'repeat(2, 1fr)', 
-            md: 'repeat(3, 1fr)' 
-          }, 
-          gap: 3 
-        }}
-      >
-        {users?.map((user: User) => 
-          <StyledCard key={user.userId}>
-              <CardContent>
-                <Typography variant="h5" component="h2" gutterBottom>
-                  {user.name}
-                </Typography>
-                <Typography color="text.secondary">
-                  Cages: {user.noOfCages}
-                </Typography>
-                <Typography color="text.secondary">
-                  Barge: {user.hasBarge ? 'Yes' : 'No'}
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button size="small" onClick={() => navigate(`/users/${user.userId}`)}>
-                  View Details
-                </Button>
-              </CardActions>
-            </StyledCard>
-        )}
-      </Box> */}
-
       <ProtectedWrapper allowedRoles={['OrgAdmin']}>
       <Fab 
         color="primary" 

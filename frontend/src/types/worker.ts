@@ -1,9 +1,3 @@
-// export interface CreateWorkerForm {
-//         Name:string,
-//         Age: number;
-//         Email: string;
-//         Phone: string;
-// }
 
 export interface WorkerResponse {
         workerId: string;
@@ -13,14 +7,6 @@ export interface WorkerResponse {
         picture: string;
         phone: string;
 }
-
-// export interface EditWorkerForm {
-//         Name:string,
-//         Age: number;
-//         Email: string;
-//         Phone: string;
-//         Picture: string;
-// }
 
 export type Roles = "CEO" | "Captain" | "Worker";
 

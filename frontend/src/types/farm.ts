@@ -1,10 +1,3 @@
-// export interface CreateFarmForm {
-//         Name:string,
-//         Longitude: number;
-//         Latitude: number;
-//         NoOfCages: number;
-//         HasBarge: boolean;
-// }
 
 export interface FarmResponse {
         farmId: string;
@@ -17,13 +10,4 @@ export interface FarmResponse {
         phone: string;
 }
 
-// export interface EditFarmForm {
-//         Name:string,
-//         Longitude: number;
-//         Latitude: number;
-//         NoOfCages: number;
-//         HasBarge: boolean;
-//         Picture: string;
-//         Phone: string;
-// }
 
