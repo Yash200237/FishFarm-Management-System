@@ -21,6 +21,7 @@ import { UserCreatePage } from './pages/UserCreatePage.tsx';
 import { OrgsEditForm } from './components/OrgsEditForm.tsx';
 import { UserEditPage } from './pages/UserEditPage.tsx';
 import { AdminUserEditPage } from './pages/Admin Pages/AdminUserEditPage.tsx';
+import { FarmWorkerAssignPage } from './pages/FarmWorkerAssignPage.tsx';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/farms/create" element={<ProtectedRoute allowedRoles={['OrgAdmin']}><FarmCreatePage/></ProtectedRoute>}/>
         <Route path="/farms/:farmId" element={<ProtectedRoute allowedRoles={['OrgAdmin', 'OrgUser']}><FarmPage/></ProtectedRoute>}/>
         <Route path="/farms/:farmId/edit" element={<ProtectedRoute allowedRoles={['OrgAdmin']}><FarmEditForm/></ProtectedRoute>}/>
+        <Route path="/farms/:farmId/workers/assign" element={<ProtectedRoute allowedRoles={['OrgAdmin']}><FarmWorkerAssignPage/></ProtectedRoute>}/>
 
         <Route path="/workers" element={<ProtectedRoute allowedRoles={['OrgAdmin', 'OrgUser']}><WorkersPage/></ProtectedRoute>}/>
         <Route path="/workers/create" element={<ProtectedRoute allowedRoles={['OrgAdmin', 'OrgUser']}><WorkerCreateForm/></ProtectedRoute>}/>

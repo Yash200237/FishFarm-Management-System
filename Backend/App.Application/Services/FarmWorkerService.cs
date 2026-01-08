@@ -30,6 +30,12 @@ namespace App.Application.Services
             var workers = await _farmWorkerRepository.GetWorkersUnassigned(orgId);
             return _mapper.Map<IEnumerable<WorkerResponseDto>>(workers);
         }
+        
+        public async Task<IEnumerable<WorkerResponseDto>> GetFarmWorkersUnassigned(Guid orgId,Guid farmId)
+        {
+            var workers = await _farmWorkerRepository.GetWorkersUnassignedToFarm(orgId, farmId);
+            return _mapper.Map<IEnumerable<WorkerResponseDto>>(workers);
+        }
 
         public async Task<WorkerToFarmDto> AssignWorker(WorkerToFarmDto workerToFarmDto)
         {

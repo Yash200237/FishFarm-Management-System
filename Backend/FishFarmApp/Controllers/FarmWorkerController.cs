@@ -68,6 +68,29 @@ namespace FishFarmApp.Controllers
         }
 
         [Authorize(Policy = "RequireOrgMember")]
+        [HttpGet("worker/unassigned/{farmId}")]
+        public async Task<ActionResult<IEnumerable<WorkerResponseDto>>> GetUnassignedWorkersToFarm(Guid farmId)
+        {
+            try
+            {
+                var orgClaimValue = User.FindFirst("OrgId")?.Value;
+                if (string.IsNullOrWhiteSpace(orgClaimValue))
+                    return Forbid();
+
+                if (!Guid.TryParse(orgClaimValue, out var orgId))
+                    return Forbid();
+
+                var unasignedWorkersToFarm = await _farmWorkerService.GetFarmWorkersUnassigned(orgId,farmId);
+                return Ok(unasignedWorkersToFarm);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogError(ex, $"Unassigned workers not found.");
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+        [Authorize(Policy = "RequireOrgMember")]
         [HttpPost]
         public async Task<ActionResult> AssignWorkerToFarm(WorkerToFarmDto workerToFarmDto)
         {

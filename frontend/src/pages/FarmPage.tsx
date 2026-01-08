@@ -116,9 +116,19 @@ export const FarmPage = () => {
 
           <Divider sx={{ my: 3 }} />
 
-          <Typography variant="h5" gutterBottom>
-            Farm Workers
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h5" gutterBottom>
+                Farm Workers
+              </Typography>
+              <Button 
+                  size="small" 
+                  variant="contained"
+                  onClick={() => navigate(`/farms/${farm.farmId}/workers/assign`)}
+                >
+                  Assign Workers
+                </Button>
+          </Box>
+
           
           {workers.length === 0 ? (
             <Alert severity="info">No workers assigned to this farm</Alert>
