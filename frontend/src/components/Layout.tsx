@@ -16,6 +16,9 @@ import { useAuth } from '../contexts/AuthProviderHook';
 import AnchorIcon from '@mui/icons-material/Anchor';
 import Box from '@mui/material/Box';
 import { ProtectedWrapper } from './ProtectedWrapper';
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
+
 
 interface LayoutProps {
   children: ReactNode;
@@ -66,12 +69,14 @@ export const Layout = ({ children }: LayoutProps) => {
               </ProtectedWrapper>
 
               {token == null ? (
-                <NavButton onClick={() => navigate('/login')}>Login</NavButton>
+                <NavButton onClick={() => navigate('/login')}>
+                  <LoginIcon/>
+                </NavButton>
               ) : (
                 <NavButton onClick={() => {
                   handleLogout()
                   navigate('/login')}}>
-                  Logout
+                  <LogoutIcon/>
                   </NavButton>
               )}
 

@@ -26,7 +26,7 @@ export const Login = () => {
         console.log(`${data.userRole}`);
         navigate("/orgs");
       } else {
-        navigate("/farms");
+        navigate("/");
       }
     } catch(error) {
       console.error("Login failed:", error);
