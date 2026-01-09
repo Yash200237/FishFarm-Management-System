@@ -18,6 +18,7 @@ import Box from '@mui/material/Box';
 import { ProtectedWrapper } from './ProtectedWrapper';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { Avatar, Popover } from '@mui/material';
 
 
 interface LayoutProps {
@@ -27,9 +28,21 @@ interface LayoutProps {
 export const Layout = ({ children }: LayoutProps) => {
   const navigate = useNavigate();
   const { mode, toggleTheme } = useThemeMode();
-  const { token, handleLogout } = useAuth();
+  const { token, handleLogout,currentUser } = useAuth();
   const [selected, setSelected] = useState<"farms" | "workers" | "users" | "organizations">();
 
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
 
   return (
     <>
@@ -67,6 +80,26 @@ export const Layout = ({ children }: LayoutProps) => {
                     setSelected("users");
                     navigate('/users')}}>Users</NavButton>
               </ProtectedWrapper>
+
+              <Avatar sx={{ width: 32, height: 32 }} onClick={handleClick}>{currentUser?.userName.charAt(0).toUpperCase()}</Avatar>
+
+              {currentUser && (
+                <Popover
+                  id={id}
+                  open={open}
+                  anchorEl={anchorEl}
+                  onClose={handleClose}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                  }}
+                >
+                  <Box sx={{ p: 2 }}>
+                  <Typography variant='body2'><strong>{currentUser?.userName}</strong></Typography>
+                  <Typography variant='body2'>{currentUser?.email}</Typography>
+                  </Box>
+              </Popover>
+                )}
 
               {token == null ? (
                 <NavButton onClick={() => navigate('/login')}>
