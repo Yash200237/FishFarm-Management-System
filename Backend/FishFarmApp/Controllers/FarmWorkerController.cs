@@ -1,5 +1,6 @@
-﻿using App.Application.Interfaces;
-using App.Application.DTOs;
+﻿using App.Application.DTOs;
+using App.Application.Interfaces;
+using App.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -87,6 +88,27 @@ namespace FishFarmApp.Controllers
             {
                 _logger.LogError(ex, $"Unassigned workers not found.");
                 return NotFound(new { message = ex.Message });
+            }
+        }
+
+        [Authorize(Policy = "RequireOrgMember")]
+        [HttpGet("{FarmId}/{WorkerId}")]
+        public async Task<ActionResult<WorkerToFarmDto>> GetFarmWorkerByIds(Guid WorkerId, Guid FarmId)
+        {
+            try
+            {
+                var farmworker = await _farmWorkerService.GetFarmWorkerByIdAsync(WorkerId, FarmId);
+                return Ok(farmworker);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "Validation error while fetching farmWorker");
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred  fetching farmWorker.");
+                return StatusCode(500, new { message = "Internal server error" });
             }
         }
 

@@ -38,6 +38,9 @@ export const WorkerPage = () => {
     })
 
     const [open,setOpen] = useState(false);
+    const [openWorker,setOpenWorker] = useState(false);
+    const [dialogWorkerId, setDialogWorkerId] = useState<string | null>(null);
+    const [dialogFarmId, setDialogFarmId] = useState<string | null>(null);
     
     const {isLoading:isFarmsLoading,isError:isFarmsError,data:farms} = useQuery(['worker_farms',workerId],() => fetchFarmByworkerId(workerId!),{ enabled: !!workerId });
 
@@ -58,6 +61,12 @@ export const WorkerPage = () => {
       setOpen(true);
     }
 
+    const handleClickOpenWorker = (workerId: string, farmId: string) => {
+      setDialogWorkerId(workerId);
+      setDialogFarmId(farmId);
+      setOpenWorker(true);
+    }
+
     return (
       <PageContainer>
         {DeleteAlertDialog(
@@ -68,6 +77,17 @@ export const WorkerPage = () => {
             setOpen(false);
           },
           () => {setOpen(false);}
+        )}
+        {openWorker && DeleteAlertDialog(
+          openWorker,
+          "this farm assignment?.",
+          () => {
+            removeWorkerFromFarmMutation.mutate({ workerId: dialogWorkerId!, farmId: dialogFarmId! });
+            setOpenWorker(false);
+          },
+          () => {
+            setOpenWorker(false);
+          }
         )}
         <ProfileCard>
           <ProfileHeader>
@@ -121,9 +141,7 @@ export const WorkerPage = () => {
                         size="small"
                         color="error"
                         disabled={removeWorkerFromFarmMutation.isLoading}
-                        onClick={() =>
-                          removeWorkerFromFarmMutation.mutate({ workerId: worker.workerId, farmId: farm.farmId })
-                        }
+                        onClick={() =>handleClickOpenWorker(worker.workerId, farm.farmId)}
                       >
                         {removeWorkerFromFarmMutation.isLoading ? "Removing..." : "Remove"}
                       </Button>

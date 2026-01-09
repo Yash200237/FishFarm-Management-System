@@ -10,11 +10,11 @@ export interface WorkerResponse {
 
 export type Roles = "CEO" | "Captain" | "Worker";
 
-export interface AssignWorkerForm {
-        FarmId: string;
-        WorkerId: string;
-        Role: Roles;
-        CertifiedUntil: string;
+export interface AssignWorkerFormResponse {
+        farmId: string;
+        workerId: string;
+        role: Roles;
+        certifiedUntil: string;
 }
 
 export interface FarmWorkerDetails {

@@ -10,6 +10,7 @@ namespace App.Application.Interfaces
         Task<WorkerToFarmDto> ModifyAssignment(WorkerToFarmDto workerToFarmDto); //update role and certified until
         Task RemoveWorker(Guid WorkerId, Guid FarmId);  //remove worker from farm
         Task<IEnumerable<WorkerResponseDto>> GetUnassignedWorkers(Guid orgId);
+        Task<WorkerToFarmDto> GetFarmWorkerByIdAsync(Guid workerId, Guid farmId);
         Task<IEnumerable<WorkerResponseDto>> GetFarmWorkersUnassigned(Guid orgId, Guid farmId);
 
 

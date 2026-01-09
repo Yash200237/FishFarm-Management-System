@@ -1,5 +1,5 @@
 import type { AssignSchema, WorkerSchema } from "../schemas/workerSchemas";
-import type { AssignWorkerForm, FarmWorkerDetails, WorkerResponse } from "../types/worker";
+import type { AssignWorkerFormResponse, FarmWorkerDetails, WorkerResponse } from "../types/worker";
 import { api } from "./apiClient";
 
 export async function fetchWorkers(): Promise<WorkerResponse[]> {
@@ -32,13 +32,18 @@ export async function DeleteWorker(workerId: string){
     return null;
 }
 
-export async function assignWorkerToFarm(payload: AssignSchema): Promise<AssignWorkerForm> {
-  const response = await api.post<AssignSchema>("/FarmWorker", payload);
+export async function fetchWorkerToFarm(workerId:string, farmId:string): Promise<AssignWorkerFormResponse> {
+  const response = await api.get<AssignWorkerFormResponse>(`/FarmWorker/${farmId}/${workerId}`);
   return response.data;
 }
 
-export async function updateWorkerToFarm(payload: AssignSchema): Promise<AssignWorkerForm> {
-  const response = await api.patch<AssignSchema>("/FarmWorker", payload);
+export async function assignWorkerToFarm(payload: AssignSchema): Promise<AssignWorkerFormResponse> {
+  const response = await api.post<AssignWorkerFormResponse>("/FarmWorker", payload);
+  return response.data;
+}
+
+export async function updateWorkerToFarm(payload: AssignSchema): Promise<AssignWorkerFormResponse> {
+  const response = await api.patch<AssignWorkerFormResponse>("/FarmWorker", payload);
   return response.data;
 }
 

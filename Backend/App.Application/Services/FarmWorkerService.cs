@@ -25,6 +25,13 @@ namespace App.Application.Services
             var farmworkers = await _farmWorkerRepository.GetFarmsForWorkerId(workerId);
             return _mapper.Map<IEnumerable<FarmWDetailsDto>>(farmworkers);
         }
+
+        public async Task<WorkerToFarmDto> GetFarmWorkerByIdAsync(Guid workerId,Guid farmId)
+        {
+            var farmworker = await _farmWorkerRepository.GetByIdAsync(farmId,workerId);
+            return _mapper.Map<WorkerToFarmDto>(farmworker);
+        }
+
         public async Task<IEnumerable<WorkerResponseDto>> GetUnassignedWorkers(Guid orgId)
         {
             var workers = await _farmWorkerRepository.GetWorkersUnassigned(orgId);
