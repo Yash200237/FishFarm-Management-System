@@ -7,6 +7,7 @@ import Button from '@mui/material/Button'
 import Alert from '@mui/material/Alert'
 import { StyledPaper, StyledForm } from './Login.styles'
 import { useAuth } from "../contexts/AuthProviderHook"
+import { AxiosError } from "axios"
 
 export const Login = () => {
   const [user, setUser] = useState<LoginUserForm>({
@@ -19,18 +20,10 @@ export const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    try {
-      const data =await handleLogin(user);
-      console.log(`${data}`);
-      if (data.userRole === "GlobalAdmin") {
-        console.log(`${data.userRole}`);
-        navigate("/orgs");
-      } else {
-        navigate("/");
-      }
-    } catch(error) {
-      console.error("Login failed:", error);
-    }
+    const data =await handleLogin(user);
+    console.log(`${data}`);
+    navigate(data.userRole === "GlobalAdmin" ? "/orgs" : "/")
+        console.error("Invalid email/username or password.");
   }
 
   return (
@@ -68,8 +61,12 @@ export const Login = () => {
 
         {isError && (
           <Alert severity="error">
-            {error instanceof Error
-              ? error.message
+            {error instanceof AxiosError
+              ? error.response?.status === 401
+                ? "Invalid email/username or password."
+                : error.response?.status === 403
+                  ? "Your account is inactive. Please contact the administrator."
+                  : `Login failed: ${error.message}`
               : "Login failed"}
           </Alert>
         )}

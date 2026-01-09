@@ -28,7 +28,7 @@ export interface User {
 export interface EditUserForm {
         Name: string,
         Email: string,
-        PasswordHash: string,
+        PasswordHash?: string,
         UserName: string,
         UserRole: UserRoles,
 }

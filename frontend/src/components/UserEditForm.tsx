@@ -13,6 +13,7 @@ import type { UserRoles } from "../types/user";
 import { userEditSchema } from "../schemas/userSchemas";
 import Box from "@mui/material/Box";
 import ButtonGroup from "@mui/material/ButtonGroup";
+import type { EditUserForm } from "../types/user";
 
 
 
@@ -57,7 +58,7 @@ export function UserEditForm(userRoleProp: {value: UserRoles}){
     const editUserMutation = useMutation(EditUser,
         {
             onSuccess: () => {
-                queryClient.invalidateQueries(['users', orgId]);
+                queryClient.invalidateQueries(['users', userId]);
                 if (userRoleProp.value === 'OrgAdmin') {
                     navigate(`/Orgs/${orgId}`)
                 } else {
@@ -91,15 +92,17 @@ export function UserEditForm(userRoleProp: {value: UserRoles}){
         e.preventDefault();
         const result = userEditSchema.safeParse(user);
         if(result.success){
-            await editUserMutation.mutateAsync({userId: userId!, user: 
-                {
-                    Name: user.Name,
-                    Email: user.Email,
-                    PasswordHash: user.Password,
-                    UserName: user.UserName,
-                    UserRole: user.UserRole,
-                }
-            });
+            const parsed = result.data;
+            const userPayload: EditUserForm = {
+                Name: parsed.Name,
+                Email: parsed.Email,
+                UserName: parsed.UserName,
+                UserRole: parsed.UserRole,
+            };
+            if (parsed.Password) {
+                userPayload.PasswordHash = parsed.Password;
+            }
+            await editUserMutation.mutateAsync({userId: userId!, user: userPayload});
             setUser({
                 Name: "",
                 Email: "",
@@ -127,7 +130,7 @@ export function UserEditForm(userRoleProp: {value: UserRoles}){
             type={"text"}
             name={field.key}
             label={field.label}
-            value={String(user[field.key])}
+            value={((user[field.key])??"")as string}
             onChange={handleChangeInput}
             fullWidth
             disabled={field.key === "UserRole"}
