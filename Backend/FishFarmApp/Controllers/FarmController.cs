@@ -7,55 +7,42 @@ namespace FishFarmApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class FarmController(IFarmService farmService, ILogger<FarmController> logger) : ControllerBase
+    public class FarmController(IFarmService farmService) : ControllerBase
     {
         private readonly IFarmService _farmService = farmService;
-        private readonly ILogger<FarmController> _logger = logger;
 
         [Authorize(Policy = "RequireOrgAdmin")]
         [HttpPost]
         public async Task<ActionResult<FarmResponseDto>> CreateFarm([FromBody] CreateFarmDto createFarmDto)
         {
-            try
-            {
-                var orgClaimValue = User.FindFirst("OrgId")?.Value;
-                if (string.IsNullOrWhiteSpace(orgClaimValue))
-                    return Forbid();
+            var orgClaimValue = User.FindFirst("OrgId")?.Value;
+            if (string.IsNullOrWhiteSpace(orgClaimValue))
+                return Forbid();
 
-                if (!Guid.TryParse(orgClaimValue, out var orgId))
-                    return Forbid();
+            if (!Guid.TryParse(orgClaimValue, out var orgId))
+                return Forbid();
 
-                var createdFarm = await _farmService.CreateFarmAsync(orgId, createFarmDto);
-                return CreatedAtAction(nameof(GetFarmById), new { id = createdFarm.FarmId }, createdFarm);
-            }
-            catch (ArgumentException ex)
-            {
-                _logger.LogError(ex, "Validation error while creating farm.");
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while creating farm.");
-                return StatusCode(500, new { message = "Internal server error" });
-            }
+            var createdFarm = await _farmService.CreateFarmAsync(orgId, createFarmDto);
+            return CreatedAtAction(nameof(GetFarmById), new { id = createdFarm.FarmId }, createdFarm);
         }
+
 
         [HttpGet("{id}")]
         [Authorize(Policy = "RequireOrgMember")]
-
         public async Task<ActionResult<FarmResponseDto>> GetFarmById(Guid id)
         {
-            try
-            {
-                var farm = await _farmService.GetFarmByIdAsync(id);
-                return Ok(farm);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                _logger.LogError(ex, $"Farm with ID {id} not found.");
-                return NotFound(new { message = ex.Message });
-            }
+            var orgClaimValue = User.FindFirst("OrgId")?.Value;
+            if (string.IsNullOrWhiteSpace(orgClaimValue))
+                return Forbid();
+
+            if (!Guid.TryParse(orgClaimValue, out var orgId))
+                return Forbid();
+
+            var farm = await _farmService.GetFarmByIdAsync(id, orgId);
+            return Ok(farm);
+
         }
+
 
         [Authorize(Policy = "RequireOrgMember")]
         [HttpGet]
@@ -71,51 +58,37 @@ namespace FishFarmApp.Controllers
             return Ok(farms);
         }
 
+
         [Authorize(Policy = "RequireOrgAdmin")]
         [HttpPut("{id}")]
         public async Task<ActionResult<FarmResponseDto>> UpdateFarm(Guid id,[FromBody] UpdateFarmDto updateFarmDto)
         {
-            try
-            {
-                var updatedFarm = await _farmService.UpdateFarmAsync(id, updateFarmDto);
-                return Ok(updatedFarm);
-            }
-            catch (ArgumentException ex)
-            {
-                _logger.LogError(ex, "Validation error while updating farm.");
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                _logger.LogError(ex, $"Farm with ID {id} not found.");
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while updating farm.");
-                return StatusCode(500, new { message = "Internal server error" });
-            }
+            var orgClaimValue = User.FindFirst("OrgId")?.Value;
+            if (string.IsNullOrWhiteSpace(orgClaimValue))
+                return Forbid();
+
+            if (!Guid.TryParse(orgClaimValue, out var orgId))
+                return Forbid();
+            var updatedFarm = await _farmService.UpdateFarmAsync(id, updateFarmDto,orgId);
+            return Ok(updatedFarm);
+
         }
+
 
         [Authorize(Policy = "RequireOrgAdmin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteFarm(Guid id)
         {
-            try
-            {
-                await _farmService.DeleteFarmAsync(id);
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                _logger.LogError(ex, $"Farm with ID {id} not found.");
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while deleting farm.");
-                return StatusCode(500, new { message = "Internal server error" });
-            }
+            var orgClaimValue = User.FindFirst("OrgId")?.Value;
+            if (string.IsNullOrWhiteSpace(orgClaimValue))
+                return Forbid();
+
+            if (!Guid.TryParse(orgClaimValue, out var orgId))
+                return Forbid();
+
+            await _farmService.DeleteFarmAsync(id,orgId);
+            return NoContent();
+
         }
     }
 }

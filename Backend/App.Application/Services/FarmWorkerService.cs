@@ -1,9 +1,10 @@
-﻿using App.Application.Interfaces;
-using App.Application.DTOs;
+﻿using App.Application.DTOs;
+using App.Application.Interfaces;
 using App.Domain.Entities;
 using App.Domain.Enums;
 using App.Domain.Interfaces;
 using AutoMapper;
+using System.Security.Cryptography;
 
 namespace App.Application.Services
 {
@@ -44,7 +45,7 @@ namespace App.Application.Services
             return _mapper.Map<IEnumerable<WorkerResponseDto>>(workers);
         }
 
-        public async Task<WorkerToFarmDto> AssignWorker(WorkerToFarmDto workerToFarmDto)
+        public async Task<WorkerToFarmDto> AssignWorker(WorkerToFarmDto workerToFarmDto,Guid orgId)
         {
             if (workerToFarmDto == null)
                 throw new ArgumentNullException(nameof(workerToFarmDto));
@@ -62,13 +63,11 @@ namespace App.Application.Services
                 workerToFarmDto.CertifiedUntil.Value < DateOnly.FromDateTime(DateTime.Now))
                 throw new ArgumentException("CertifiedUntil cannot be in the past.");
 
-            var CEO = await _farmRepository.GetByIdAsync(workerToFarmDto.FarmId);
-
-            var farm = await _farmRepository.GetByIdAsync(workerToFarmDto.FarmId);
+            var farm = await _farmRepository.GetByIdAsync(workerToFarmDto.FarmId, orgId);
             if (farm == null)
                 throw new KeyNotFoundException($"Farm with ID {workerToFarmDto.FarmId} not found.");
 
-            var worker = await _workerRepository.GetByIdAsync(workerToFarmDto.WorkerId);
+            var worker = await _workerRepository.GetByIdAsync(workerToFarmDto.WorkerId, orgId);
             if (worker == null)
                 throw new KeyNotFoundException($"Worker with ID {workerToFarmDto.WorkerId} not found.");
 

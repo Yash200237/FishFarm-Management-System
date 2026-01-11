@@ -4,10 +4,10 @@ namespace App.Domain.Interfaces
 {
     public interface IFarmRepository
     {
-        Task<Farm?> GetByIdAsync(Guid farmId);
+        Task<Farm?> GetByIdAsync(Guid farmId, Guid orgId);
         Task<IEnumerable<Farm>> GetAllAsync(Guid orgId);
         Task<Farm> CreateAsync(Farm farm);
         Task UpdateAsync(Farm farm);
-        Task<bool> DeleteAsync(Guid farmId);
+        Task<bool> DeleteAsync(Guid farmId, Guid orgId);
     }
 }

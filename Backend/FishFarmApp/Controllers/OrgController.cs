@@ -1,5 +1,6 @@
-﻿using App.Application.Interfaces;
-using App.Application.DTOs;
+﻿using App.Application.DTOs;
+using App.Application.Interfaces;
+using App.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,47 +8,38 @@ namespace FishFarmApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class OrgController(IOrgService orgService, ILogger<OrgController> logger) : ControllerBase
+    public class OrgController(IOrgService orgService) : ControllerBase
     {
         private readonly IOrgService _orgService = orgService;
-        private readonly ILogger<OrgController> _logger = logger;
 
         [Authorize(Policy = "RequireGlobalAdmin")]
         [HttpPost]
         public async Task<ActionResult<OrgResponseDto>> CreateOrg([FromBody] OrgDto createOrgDto)
         {
-            try
-            {
                 var createdOrg = await _orgService.CreateOrgAsync(createOrgDto);
                 return CreatedAtAction(nameof(GetOrgById), new { id = createdOrg.OrgId }, createdOrg);
-            }
-            catch (ArgumentException ex)
-            {
-                _logger.LogError(ex, "Validation error while creating organization.");
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while creating organization.");
-                return StatusCode(500, new { message = "Internal server error" });
-            }
+
         }
 
+        [Authorize(Policy = "RequireAnyUser")]
         [HttpGet("{id}")]
-
         public async Task<ActionResult<OrgResponseDto>> GetOrgById(Guid id)
         {
-            try
+            if (!User.IsInRole(UserRoles.GlobalAdmin.ToString()))
             {
-                var org = await _orgService.GetOrgByIdAsync(id);
-                return Ok(org);
+                var orgClaimValue = User.FindFirst("OrgId")?.Value;
+
+                if (string.IsNullOrWhiteSpace(orgClaimValue) || !Guid.TryParse(orgClaimValue, out var orgId))
+                    return Forbid();
+
+                if (orgId != id)
+                    return Forbid();
             }
-            catch (KeyNotFoundException ex)
-            {
-                _logger.LogError(ex, $"Organization with ID {id} not found.");
-                return NotFound(new { message = ex.Message });
-            }
+
+            var org = await _orgService.GetOrgByIdAsync(id);
+            return Ok(org);
         }
+
 
         [Authorize(Policy = "RequireGlobalAdmin")]
         [HttpGet]
@@ -57,57 +49,25 @@ namespace FishFarmApp.Controllers
             return Ok(orgs);
         }
 
+        [Authorize(Policy = "RequireGlobalAdmin")]
         [HttpPut("{id}")]
         public async Task<ActionResult<OrgResponseDto>> UpdateOrg(Guid id, [FromBody] OrgDto updateOrgDto)
         {
-            try
-            {
+
                 var updatedOrg = await _orgService.UpdateOrgAsync(id, updateOrgDto);
                 return Ok(updatedOrg);
-            }
-            catch (ArgumentException ex)
-            {
-                _logger.LogError(ex, "Validation error while updating organization.");
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                _logger.LogError(ex, $"Organization with ID {id} not found.");
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while updating organization.");
-                return StatusCode(500, new { message = "Internal server error" });
-            }
+
         }
 
         [Authorize(Policy = "RequireGlobalAdmin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteOrg(Guid id)
         {
-            try
-            {
+
                 await _orgService.DeleteOrgAsync(id);
                 return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                _logger.LogError(ex, $"Organization with ID {id} not found.");
-                return NotFound(new { message = ex.Message });
-            }
-            catch (ArgumentException ex)
-            {
-                _logger.LogError(ex, "Validation error while deleting organization.");
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while deleting organization.");
-                return StatusCode(500, new { message = "Internal server error" });
-            }
+ 
         }
-
 
 
     }

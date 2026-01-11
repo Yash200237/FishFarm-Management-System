@@ -1,8 +1,9 @@
-﻿using App.Application.Interfaces;
-using App.Application.DTOs;
+﻿using App.Application.DTOs;
+using App.Application.Interfaces;
 using App.Domain.Entities;
 using App.Domain.Interfaces;
 using AutoMapper;
+using System.Security.Cryptography;
 
 namespace App.Application.Services
 {
@@ -46,9 +47,9 @@ namespace App.Application.Services
 
         }
 
-        public async Task<WorkerResponseDto> GetWorkerByIdAsync(Guid id)
+        public async Task<WorkerResponseDto> GetWorkerByIdAsync(Guid id, Guid orgId)
         {
-            var worker = await _workerRepository.GetByIdAsync(id);
+            var worker = await _workerRepository.GetByIdAsync(id, orgId);
             if (worker == null)
                 throw new KeyNotFoundException($"Worker with ID {id} not found.");
             return _mapper.Map<WorkerResponseDto>(worker);
@@ -61,12 +62,12 @@ namespace App.Application.Services
 
         }
 
-        public async Task<WorkerResponseDto> UpdateWorkerAsync(Guid id, UpdateWorkerDto updateWorkerDto)
+        public async Task<WorkerResponseDto> UpdateWorkerAsync(Guid id, UpdateWorkerDto updateWorkerDto, Guid orgId)
         {
             if (updateWorkerDto == null)
                 throw new ArgumentNullException(nameof(updateWorkerDto));
 
-            var worker = await _workerRepository.GetByIdAsync(id);
+            var worker = await _workerRepository.GetByIdAsync(id, orgId);
 
             if (worker == null)
                 throw new KeyNotFoundException($"Worker with ID {id} not found.");
@@ -97,9 +98,9 @@ namespace App.Application.Services
             return _mapper.Map<WorkerResponseDto>(worker);
         }
 
-        public async Task DeleteWorkerAsync(Guid id)
+        public async Task DeleteWorkerAsync(Guid id,Guid orgId)
         {
-            var deleted = await _workerRepository.DeleteAsync(id);
+            var deleted = await _workerRepository.DeleteAsync(id, orgId);
             if (!deleted)
                 throw new KeyNotFoundException($"Worker with ID {id} not found.");
         }

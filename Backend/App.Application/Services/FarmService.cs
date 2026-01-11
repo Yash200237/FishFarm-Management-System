@@ -47,9 +47,9 @@ namespace App.Application.Services
 
         }
 
-        public async Task<FarmResponseDto> GetFarmByIdAsync(Guid id)
+        public async Task<FarmResponseDto> GetFarmByIdAsync(Guid id,Guid orgId)
         {
-            var farm = await _farmRepository.GetByIdAsync(id);
+            var farm = await _farmRepository.GetByIdAsync(id, orgId);
             if (farm == null)
                 throw new KeyNotFoundException($"Farm with ID {id} not found.");
             return _mapper.Map<FarmResponseDto>(farm);
@@ -62,12 +62,12 @@ namespace App.Application.Services
 
         }
 
-        public async Task<FarmResponseDto> UpdateFarmAsync(Guid id, UpdateFarmDto updateFarmDto)
+        public async Task<FarmResponseDto> UpdateFarmAsync(Guid id, UpdateFarmDto updateFarmDto, Guid orgId)
         {
             if (updateFarmDto == null)
                 throw new ArgumentNullException(nameof(updateFarmDto));
 
-            var farm = await _farmRepository.GetByIdAsync(id);
+            var farm = await _farmRepository.GetByIdAsync(id,orgId);
 
             if (farm == null)
                 throw new KeyNotFoundException($"Farm with ID {id} not found.");
@@ -106,10 +106,10 @@ namespace App.Application.Services
             return _mapper.Map<FarmResponseDto>(farm);
         }
 
-        public async Task DeleteFarmAsync(Guid id)
+        public async Task DeleteFarmAsync(Guid id,Guid orgId)
         {
-            var deleted = await _farmRepository.DeleteAsync(id);
-            if(!deleted)
+            var deleted = await _farmRepository.DeleteAsync(id, orgId);
+            if (!deleted)
                 throw new KeyNotFoundException($"Farm with ID {id} not found.");    
         }
 

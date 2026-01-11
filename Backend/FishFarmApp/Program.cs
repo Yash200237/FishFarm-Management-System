@@ -1,5 +1,6 @@
 using App.Application.Mapping;
 using FishFarmApp;
+using FishFarmApp.Middleware;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 
@@ -8,18 +9,16 @@ var builder = WebApplication.CreateBuilder(args);   //create the builder to buil
 
 // Add services to the container.
 
-builder.Services.AddControllers();  //find all with name Controller and register them
+builder.Services.AddControllers().AddJsonOptions(o =>  //enum as string in json responses
+{
+    o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+}); 
 builder.Services.AddAutoMapper(cfg => { }, typeof(FarmMappingProfle)); //automapper configuration
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddEndpointsApiExplorer();    //meta data of endpoints , make easy to document and recognize endpoint
-
-builder.Services.AddControllers().AddJsonOptions(o =>  //enum as string in json responses
-{
-    o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-});
 
 
 builder.Services.AddSwaggerGen(swagger =>   //sets up and configure swagger ui
@@ -74,6 +73,9 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<AppExceptionHandler>();
+
 
 var app = builder.Build();  //build
 
@@ -87,6 +89,8 @@ if (app.Environment.IsDevelopment())
 //middlewares
 
 app.UseCors("AllowFrontend");
+
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();  //automtically redirect http to https
 

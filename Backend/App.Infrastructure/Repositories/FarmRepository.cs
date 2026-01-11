@@ -16,9 +16,9 @@ namespace App.Infrastructure.Repositories
             return farm;
         }
 
-        public async Task<bool> DeleteAsync(Guid farmId)
+        public async Task<bool> DeleteAsync(Guid farmId, Guid orgId)
         {
-            var farm = await _context.Farms.FindAsync(farmId);
+            var farm = await _context.Farms.FirstOrDefaultAsync(f => f.FarmId == farmId && f.OrgId == orgId);
             if (farm == null) return false;
             _context.Farms.Remove(farm);
             await _context.SaveChangesAsync();
@@ -32,10 +32,10 @@ namespace App.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Farm?> GetByIdAsync(Guid farmId)
+        public async Task<Farm?> GetByIdAsync(Guid farmId, Guid orgId)
         {
-            return await _context.Farms.FirstOrDefaultAsync(f => f.FarmId == farmId);
-             
+            return await _context.Farms.FirstOrDefaultAsync(f => f.FarmId == farmId && f.OrgId == orgId);
+
         }
 
         public async Task UpdateAsync(Farm farm)

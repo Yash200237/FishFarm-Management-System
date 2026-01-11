@@ -15,9 +15,9 @@ namespace App.Infrastructure.Repositories
             return worker;
         }
 
-        public async Task<bool> DeleteAsync(Guid workerId)
+        public async Task<bool> DeleteAsync(Guid workerId, Guid orgId)
         {
-            var worker = await _context.Workers.FindAsync(workerId);
+            var worker = await _context.Workers.FirstOrDefaultAsync(f => f.WorkerId == workerId && f.OrgId == orgId);
             if (worker == null) return false;
             _context.Workers.Remove(worker);
             await _context.SaveChangesAsync();
@@ -30,9 +30,9 @@ namespace App.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Worker> GetByIdAsync(Guid workerId)
+        public async Task<Worker> GetByIdAsync(Guid workerId, Guid orgId)
         {
-            var worker = await _context.Workers.FirstOrDefaultAsync(f => f.WorkerId == workerId);
+            var worker = await _context.Workers.FirstOrDefaultAsync(f => f.WorkerId == workerId && f.OrgId == orgId);
             return worker!;
         }
 
