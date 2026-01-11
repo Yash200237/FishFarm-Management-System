@@ -9,7 +9,7 @@ import Alert from '@mui/material/Alert'
 import CircularProgress from '@mui/material/CircularProgress'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
-import { StyledPaper, StyledForm } from './FarmCreateForm.styles'
+import { StyledPaper, StyledForm } from '../styles/Common.styles'
 import type { FarmSchema } from "../schemas/farmSchemas";
 import { farmSchema } from "../schemas/farmSchemas";
 

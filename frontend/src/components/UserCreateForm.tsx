@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Alert from '@mui/material/Alert'
 import CircularProgress from '@mui/material/CircularProgress'
-import { StyledPaper, StyledForm } from './UserCreateForm.styles'
+import { StyledPaper, StyledForm } from '../styles/Common.styles'
 import type { UserSchema } from "../schemas/userSchemas";
 import type { UserRoles } from "../types/user";
 import { userSchema } from "../schemas/userSchemas";

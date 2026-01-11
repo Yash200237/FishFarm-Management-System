@@ -3,11 +3,6 @@ import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
 import ListItem from '@mui/material/ListItem';
 
-export const PageContainer = styled(Box)({
-  maxWidth: 900,
-  margin: '0 auto',
-});
-
 export const DetailCard = styled(Card)(({ theme }) => ({
   padding: theme.spacing(3),
   marginBottom: theme.spacing(3),

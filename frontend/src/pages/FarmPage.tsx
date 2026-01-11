@@ -16,7 +16,8 @@ import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { PageContainer, DetailCard, InfoSection, WorkerListItem } from './FarmPage.styles'
+import { DetailCard, InfoSection, WorkerListItem } from '../styles/FarmPage.styles'
+import {PageContainer} from '../styles/Common.styles'
 import { ProtectedWrapper } from "../components/ProtectedWrapper";
 import { DeleteAlertDialog } from "../components/DeleteAlertDialog";
 import { useState } from "react";
@@ -104,7 +105,7 @@ export const FarmPage = () => {
               <strong>Has Barge:</strong> <Chip label={farm.hasBarge ? "Yes" : "No"} color={farm.hasBarge ? "success" : "default"} size="small" />
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              <strong>Phone:</strong> {farm.phone}
+              <strong>Phone:</strong> {farm.phone ?  farm.phone : <i>Not Provided</i>}
             </Typography>
           </InfoSection>
 

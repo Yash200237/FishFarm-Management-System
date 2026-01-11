@@ -11,7 +11,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Alert from '@mui/material/Alert'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
-import { PageContainer, StyledCard } from './FarmsPage.styles'
+import { PageContainer, StyledCard } from '../styles/Common.styles.ts'
 import type { AxiosError } from "axios";
 import { ProtectedWrapper } from "../components/ProtectedWrapper.tsx";
 

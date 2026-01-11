@@ -15,7 +15,7 @@ import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { PageContainer, DetailCard, InfoSection, UserListItem } from './OrgPage.styles'
+import { PageContainer, DetailCard, InfoSection, UserListItem } from '../../styles/OrgPage.styles.ts'
 import { ProtectedWrapper } from "../../components/ProtectedWrapper.tsx";
 import type { User } from "../../types/user.ts";
 import Grid from '@mui/material/Grid';

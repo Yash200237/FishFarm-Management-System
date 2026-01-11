@@ -5,7 +5,8 @@ import Typography from '@mui/material/Typography'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Alert from '@mui/material/Alert'
-import { StyledPaper, StyledForm } from './Login.styles'
+import { StyledPaper } from '../styles/Login.styles'
+import {StyledForm} from '../styles/Common.styles'
 import { useAuth } from "../contexts/AuthProviderHook"
 import { AxiosError } from "axios"
 

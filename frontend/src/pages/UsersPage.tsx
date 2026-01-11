@@ -7,8 +7,8 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Alert from '@mui/material/Alert'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
-import { PageContainer } from './FarmsPage.styles'
-import { SectionContainer } from './WorkersPage.styles.ts'
+import { PageContainer } from '../styles/Common.styles.ts'
+import { SectionContainer } from '../styles/WorkersPage.styles.ts'
 import type { AxiosError } from "axios";
 import { ProtectedWrapper } from "../components/ProtectedWrapper.tsx";
 import type { User } from "../types/user.ts";

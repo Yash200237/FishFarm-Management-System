@@ -11,7 +11,7 @@ import {
   NavButton,
   ThemeToggleButton,
   MainContent,
-} from './Layout.styles';
+} from '../styles/Layout.styles';
 import { useAuth } from '../contexts/AuthProviderHook';
 import AnchorIcon from '@mui/icons-material/Anchor';
 import Box from '@mui/material/Box';

@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Alert from '@mui/material/Alert'
 import CircularProgress from '@mui/material/CircularProgress'
-import { StyledPaper, StyledForm } from './WorkerCreateForm.styles'
+import { StyledPaper, StyledForm } from '../styles/Common.styles'
 import type { WorkerSchema } from "../schemas/workerSchemas";
 import { workerSchema } from "../schemas/workerSchemas";
 

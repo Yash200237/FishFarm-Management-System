@@ -1,6 +1,7 @@
 import { styled } from '@mui/material/styles';
-import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import Paper from '@mui/material/Paper';
 
 export const PageContainer = styled(Box)({
   maxWidth: 1200,
@@ -15,9 +16,19 @@ export const StyledCard = styled(Card)(({ theme }) => ({
   },
 }));
 
+export const StyledPaper = styled(Paper)(({ theme }) => ({
+  maxWidth: 600,
+  margin: '0 auto',
+  padding: theme.spacing(4),
+}));
+
+export const StyledForm = styled('form')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(2),
+}));
+
 export const SectionContainer = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(4),
-  padding: theme.spacing(2),
-  backgroundColor: theme.palette.background.paper,
-  borderRadius: theme.shape.borderRadius,
 }));
+

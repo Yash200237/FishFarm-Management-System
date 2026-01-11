@@ -18,7 +18,8 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EmailIcon from '@mui/icons-material/Email'
 import PhoneIcon from '@mui/icons-material/Phone'
-import { PageContainer, ProfileCard, ProfileHeader, StyledAvatar, InfoSection, FarmListItem } from './WorkerPage.styles'
+import { ProfileCard, ProfileHeader, StyledAvatar, InfoSection, FarmListItem } from '../styles/WorkerPage.styles'
+import { PageContainer} from '../styles/Common.styles'
 import { useState } from "react";
 import { DeleteAlertDialog } from "../components/DeleteAlertDialog";
 

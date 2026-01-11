@@ -15,7 +15,8 @@ import ListItemText from '@mui/material/ListItemText'
 import Chip from '@mui/material/Chip'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
-import { PageContainer, StyledCard, SectionContainer } from './WorkersPage.styles'
+import { SectionContainer } from '../styles/WorkersPage.styles.ts'
+import { PageContainer, StyledCard } from '../styles/Common.styles.ts'
 import type { AxiosError } from "axios";
 
 export function WorkersPage() {

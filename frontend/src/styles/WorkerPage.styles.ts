@@ -4,10 +4,10 @@ import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
 import ListItem from '@mui/material/ListItem';
 
-export const PageContainer = styled(Box)({
-  maxWidth: 900,
-  margin: '0 auto',
-});
+// export const PageContainer = styled(Box)({
+//   maxWidth: 900,
+//   margin: '0 auto',
+// });
 
 export const ProfileCard = styled(Card)(({ theme }) => ({
   padding: theme.spacing(3),

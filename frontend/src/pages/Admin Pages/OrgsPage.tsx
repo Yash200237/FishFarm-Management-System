@@ -7,7 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Alert from '@mui/material/Alert'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
-import { PageContainer } from './OrgsPage.styles.ts'
+import { PageContainer } from '../../styles/Common.styles.ts'
 import type { AxiosError } from "axios";
 import type { OrgResponse } from "../../types/org.ts";
 import { Avatar,Accordion,AccordionActions,AccordionSummary,AccordionDetails  } from "@mui/material";

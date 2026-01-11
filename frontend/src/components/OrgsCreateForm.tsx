@@ -9,7 +9,7 @@ import Alert from '@mui/material/Alert'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'
-import { StyledPaper, StyledForm } from './OrgCreateForm.styles'
+import { StyledPaper, StyledForm } from '../styles/Common.styles'
 import { orgSchema, type OrgSchema } from "../schemas/orgSchemas";
 import { fileToBase64, validateImageFile } from "../utils/file";
 
