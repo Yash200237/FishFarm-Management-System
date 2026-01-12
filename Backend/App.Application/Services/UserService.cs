@@ -39,8 +39,8 @@ namespace App.Application.Services
             if (string.IsNullOrWhiteSpace(registerUserDto.Password))
                 throw new ArgumentException("Password is required.");
 
-            if (registerUserDto.Password.Length > 255)
-                throw new ArgumentException("Password cannot exceed 255 characters.");
+            if (registerUserDto.Password.Length > 72)
+                throw new ArgumentException("Password cannot exceed 72 characters.");
 
             if (!string.Equals(registerUserDto.Password, registerUserDto.ConfirmPassword, StringComparison.Ordinal))
                 throw new ArgumentException("Password and confirm password do not match.");
@@ -163,8 +163,8 @@ namespace App.Application.Services
             //if (string.IsNullOrWhiteSpace(updateUserDto.PasswordHash))
             //    throw new ArgumentException("Password hash is required.");
 
-            if (updateUserDto.PasswordHash != null && updateUserDto.PasswordHash.Length > 255)
-                throw new ArgumentException("Hashed password cannot exceed 255 characters.");
+            if (updateUserDto.PasswordHash != null && updateUserDto.PasswordHash.Length > 72)
+                throw new ArgumentException("Hashed password cannot exceed 72 characters.");
 
             var existingByEmail = await _userRepository.GetByEmailUsernameAsync(updateUserDto.Email);
             if (existingByEmail != null && existingByEmail.UserId != id)

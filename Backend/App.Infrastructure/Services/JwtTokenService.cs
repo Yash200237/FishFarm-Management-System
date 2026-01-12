@@ -30,7 +30,7 @@ namespace App.Infrastructure.Services
                 issuer: configuration["Jwt:Issuer"],
                 audience: configuration["Jwt:Audience"],
                 claims: userClaims,
-                expires: DateTime.Now.AddDays(5),
+                expires: DateTime.UtcNow.AddMinutes(1),
                 signingCredentials: credentials
             );
 
