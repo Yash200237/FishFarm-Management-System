@@ -18,10 +18,21 @@ import AddIcon from '@mui/icons-material/Add'
 import { SectionContainer } from '../styles/WorkersPage.styles.ts'
 import { PageContainer, StyledCard } from '../styles/Common.styles.ts'
 import type { AxiosError } from "axios";
+import { SearchBar } from "../components/SearchBar.tsx";
+import { useState } from "react";
 
 export function WorkersPage() {
   const navigate = useNavigate();
+  const [query, setQuery] = useState("");
+
   const {isLoading,isError,data:workers,error} = useQuery<WorkerResponse[], AxiosError>('workers',fetchWorkers);
+    
+  const filteredWorkers = workers?.filter(worker => {
+    const name = (worker.name ?? "").toLowerCase();
+    const q = query.trim().toLowerCase();
+    return q === "" || name.includes(q);
+  });
+
   const {isLoading:isUnassignedLoading,isError:isUnassignedError,data:unassignedWorkers,error:unassignedError} = useQuery<WorkerResponse[], AxiosError> ('unassigned_workers',fetchUnassignedWorkers);
   
   if(isLoading || isUnassignedLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
@@ -86,9 +97,13 @@ export function WorkersPage() {
         </SectionContainer>
       )}
 
-      <Typography variant="h5" gutterBottom sx={{ mt: 3 }}>
-        All Workers
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
+        <Typography variant="h5" gutterBottom sx={{ mt: 3 }}>
+          All Workers
+        </Typography>
+        <SearchBar query={query} setQuery={setQuery} />
+      </Box>
+
       {
         workers?.length === 0 &&
         <Alert severity="info">No workers available. Please create a new worker.</Alert>
@@ -104,7 +119,7 @@ export function WorkersPage() {
           gap: 3 
         }}
       >
-        {workers?.map((worker: WorkerResponse) => 
+        {filteredWorkers?.map((worker: WorkerResponse) => 
           <StyledCard key={worker.workerId}>
               <CardContent>
                 <Typography variant="h5" component="h2" gutterBottom>
