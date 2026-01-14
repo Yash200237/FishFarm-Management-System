@@ -1,14 +1,16 @@
 import axios from "axios"
+import { tokenStore } from "../utils/tokenStore";
 
 export const api = axios.create({
   baseURL: "https://localhost:7132/api",
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 })
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token")
+  const token = tokenStore.get();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -17,14 +19,37 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (res) => res,
-  (err) => {
-    const url = err?.config?.url ?? "";
-    const isLoginCall = url.includes("/User/login");
-    if (err?.response?.status === 401 && !isLoginCall && window.location.pathname !== "/login") {
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
-      window.location.href = "/login";
+  async (err) => {
+    try{
+    const original = err.config;
+    const status = err?.response?.status;
+    const url = original?.url ?? "";
+
+    const isLoginCall = url.includes("/Auth/Login");
+    const isRefreshCall = url.includes("/Auth/RefreshToken");
+
+    if (status !== 401 || !original) return Promise.reject(err);
+
+    if (isLoginCall || isRefreshCall) return Promise.reject(err);
+
+    if (original._retry) return Promise.reject(err);
+    original._retry = true;
+
+    const refreshRes = await api.post("/Auth/RefreshToken");
+    const newToken = refreshRes.data.token as string;
+    tokenStore.set(newToken);
+    
+    original.headers.Authorization = `Bearer ${newToken}`;
+    return api(original);
+    } 
+    catch (refreshErr) {
+      tokenStore.set(null);
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
+
+      return Promise.reject(refreshErr);
     }
-    return Promise.reject(err);
   }
 );
+  

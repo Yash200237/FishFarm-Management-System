@@ -5,10 +5,11 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Security.Cryptography;
 
 namespace App.Infrastructure.Services
 {
-    public class JwtTokenService(IConfiguration configuration) : ITokenservice 
+    public class JwtTokenService(IConfiguration configuration) : ITokenService
     {
         public string GenerateJWTToken(User user)
         {
@@ -30,11 +31,20 @@ namespace App.Infrastructure.Services
                 issuer: configuration["Jwt:Issuer"],
                 audience: configuration["Jwt:Audience"],
                 claims: userClaims,
-                expires: DateTime.UtcNow.AddMinutes(30),
+                expires: DateTime.UtcNow.AddMinutes(1),
                 signingCredentials: credentials
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[64];
+            var numberGenerator = RandomNumberGenerator.Create();
+            numberGenerator.GetBytes(randomNumber);
+
+            return Convert.ToBase64String(randomNumber);
         }
     }
 }

@@ -41,7 +41,7 @@ export function OrgsPage() {
 
       <Box>
       {orgs?.map((org: OrgResponse) => 
-      <Accordion>
+      <Accordion key ={org.orgId}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1-content" id="panel1-header">
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <Avatar src={org.logo} alt={org.name} sx={{ width: 56, height: 56 }} />
