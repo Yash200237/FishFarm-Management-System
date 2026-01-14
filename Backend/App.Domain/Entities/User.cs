@@ -12,6 +12,8 @@ namespace App.Domain.Entities
         public Guid? OrgId { get; set; }
         public Org? Org { get; set; }
         public UserRoles UserRole { get; set; } 
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiry { get; set; }
 
     }
 }

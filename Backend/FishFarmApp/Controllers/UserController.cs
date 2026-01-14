@@ -48,16 +48,6 @@ namespace FishFarmApp.Controllers
         }
 
 
-        [HttpPost("Login")]
-        public async Task<ActionResult<LoginResponseDto>> LoginUserIn([FromBody] LoginDto loginUserDto)
-        {
-
-            var loggedInUser = await _userService.GetUserByEmailUsernameAsync(loginUserDto);
-            return Ok(loggedInUser);
-
-        }
-
-
         [Authorize(Policy = "RequireGlobalAdminOrOrgAdmin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<UserResponseDto>> GetUserById(Guid id)

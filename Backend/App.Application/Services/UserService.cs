@@ -7,11 +7,10 @@ using AutoMapper;
 
 namespace App.Application.Services
 {
-    public class UserService(IUserRepository userRepository, IMapper mapper, ITokenservice jwtTokenService) : IUserService
+    public class UserService(IUserRepository userRepository, IMapper mapper) : IUserService
     {
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IMapper _mapper = mapper;
-        private readonly ITokenservice _jwtTokenService = jwtTokenService;
 
         public async Task<UserResponseDto> CreateUserAsync(RegisterUserDto registerUserDto)
         {
@@ -86,29 +85,6 @@ namespace App.Application.Services
             return _mapper.Map<UserResponseDto>(createdUser);
         }
 
-
-        public async Task<LoginResponseDto> GetUserByEmailUsernameAsync(LoginDto loginDto)
-        {
-            var user = await _userRepository.GetByEmailUsernameAsync(loginDto.EmailUsername);
-            if (user == null)
-                throw new UnauthorizedAccessException("Invalid credentials.");
-            bool checkPassword = BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash);
-            if (checkPassword)
-            {
-                var token = _jwtTokenService.GenerateJWTToken(user);
-                return new LoginResponseDto {
-                    Token = token, 
-                    UserId = user.UserId,
-                    UserName = user.UserName,
-                    Name = user.Name,
-                    Email = user.Email,
-                    OrgId = user.OrgId,
-                    UserRole = user.UserRole
-                };
-            }
-            else
-                throw new UnauthorizedAccessException("Invalid credentials.");
-        }
 
         public async Task<UserResponseDto> GetUserByIdAsync(Guid id)
         {

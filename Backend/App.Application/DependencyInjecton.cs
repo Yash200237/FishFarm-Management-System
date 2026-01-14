@@ -13,6 +13,7 @@ namespace App.Application
             services.AddScoped<IFarmWorkerService, FarmWorkerService>();   //register service with scoped lifetime
             services.AddScoped<IOrgService, OrgService>();   //register service with scoped lifetime
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAuthService, AuthService>();
 
             return services;
         }

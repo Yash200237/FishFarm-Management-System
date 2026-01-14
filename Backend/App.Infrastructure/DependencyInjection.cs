@@ -46,7 +46,7 @@ namespace App.Infrastructure
             services.AddScoped<IWorkerRepository, WorkerRepository>();   //register repository with scoped lifetime
             services.AddScoped<IFarmWorkerRepository, FarmWorkerRepository>();   //register repository with scoped lifetime
             services.AddScoped<IOrgRepository, OrgRepository>();   //register repository with scoped lifetime
-            services.AddScoped<ITokenservice, JwtTokenService>();
+            services.AddScoped<ITokenService, JwtTokenService>();
 
             return services;
             }

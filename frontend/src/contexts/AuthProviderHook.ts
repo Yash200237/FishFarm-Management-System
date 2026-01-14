@@ -8,9 +8,13 @@ interface AuthContextType {
   authLoading: boolean;
   isLoading: boolean;
   isError: boolean;
+  isLogoutLoading: boolean;
+  isLogoutError: boolean;
+  logoutError: Error | null;
   error: Error | null;
+  isRefreshing: boolean;
   handleLogin: (user:LoginUserForm) => Promise<LoginResponse>;
-  handleLogout: () => void;
+  handleLogout: () => Promise<boolean>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);

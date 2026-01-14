@@ -6,7 +6,8 @@ namespace App.Domain.Interfaces
     {
         Task<User> CreateAsync(User user);
         Task<bool> DeleteAsync(Guid userId);
-        Task<User> GetByUserIdAsync(Guid userId);
+        Task<User?> GetByUserIdAsync(Guid userId);
+        Task<User?> GetByRefreshTokenAsync(string token);
         Task<IEnumerable<User>> GetAllAsync(Guid orgId);
         Task<IEnumerable<User>> GetAllAdminAsync(Guid orgId);
         Task<User?> GetByEmailUsernameAsync(string EmailUsername);

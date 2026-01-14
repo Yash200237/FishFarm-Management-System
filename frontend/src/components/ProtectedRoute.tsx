@@ -8,7 +8,9 @@ type ProtectedRouteProps = PropsWithChildren & {
 };
 
 export function ProtectedRoute ({allowedRoles, children}:ProtectedRouteProps) {
-    const {userRole } = useAuth();
+    const {userRole, isRefreshing } = useAuth();
+    if (isRefreshing) {
+      return <Alert severity="info">Loading...</Alert>;}
     if (!userRole || (allowedRoles && !allowedRoles.includes(userRole))) {
       return <Alert severity="error">You do not have permission to view this page.</Alert>;
     }

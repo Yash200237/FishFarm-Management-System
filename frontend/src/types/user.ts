@@ -8,6 +8,7 @@ export interface LoginUserForm {
 
 export interface LoginResponse {
         token: string;
+        refreshToken: string;
         userId: string;
         name: string;
         email: string;

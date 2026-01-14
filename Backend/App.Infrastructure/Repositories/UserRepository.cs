@@ -23,6 +23,12 @@ namespace App.Infrastructure.Repositories
             return user!;
         }
 
+        public async Task<User?> GetByRefreshTokenAsync(string token)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == token);
+            return user!;
+        }
+
         public async Task<IEnumerable<User>> GetAllAsync(Guid orgId)
         {
             return await _context.Users.Where(u => u.OrgId == orgId)
