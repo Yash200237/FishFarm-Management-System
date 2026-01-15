@@ -2,7 +2,7 @@ import { useQuery } from "react-query"
 import { fetchFarms } from "../apis/farmsApis";
 import type {FarmResponse} from "../types/farm.ts";
 import { useNavigate } from "react-router-dom";
-import { useTheme } from '@mui/material/styles'
+import { alpha, useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import CardContent from '@mui/material/CardContent'
@@ -37,8 +37,8 @@ export function FarmsPage() {
   
   return (
     <PageContainer>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, backgroundColor:theme.palette.background.paper, padding: theme.spacing(2) } }>
-        <Typography variant="h4" component="h1">
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, backgroundColor:alpha(theme.palette.primary.main, 0.3), padding: theme.spacing(2) } }>
+        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
           Farms
         </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -71,7 +71,7 @@ export function FarmsPage() {
       >
         {filteredFarms?.map((farm: FarmResponse) => 
           <StyledCard key={farm.farmId}>
-              <CardContent>
+              <CardContent sx={{ border: `1px solid ${theme.palette.divider}`, borderRadius: 1, mb: 1 , backgroundColor: alpha(theme.palette.primary.main, 0.05) }}>
                 <Typography variant="h5" component="h2" gutterBottom>
                   {farm.name}
                 </Typography>

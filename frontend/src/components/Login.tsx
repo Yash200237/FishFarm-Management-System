@@ -23,8 +23,7 @@ export const Login = () => {
     e.preventDefault()
     const data =await handleLogin(user);
     console.log(`${data}`);
-    navigate(data.userRole === "GlobalAdmin" ? "/orgs" : "/")
-        console.error("Invalid email/username or password.");
+    navigate( "/")
   }
 
   return (

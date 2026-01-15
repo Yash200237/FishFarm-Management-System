@@ -20,9 +20,12 @@ import { PageContainer, StyledCard } from '../styles/Common.styles.ts'
 import type { AxiosError } from "axios";
 import { SearchBar } from "../components/SearchBar.tsx";
 import { useState } from "react";
+import { useTheme } from "@mui/material/styles";
+import { alpha } from "@mui/material/styles";
 
 export function WorkersPage() {
   const navigate = useNavigate();
+  const theme = useTheme();
   const [query, setQuery] = useState("");
 
   const {isLoading,isError,data:workers,error} = useQuery<WorkerResponse[], AxiosError>('workers',fetchWorkers);
@@ -43,8 +46,8 @@ export function WorkersPage() {
   
   return (
     <PageContainer>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1">
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3,backgroundColor:alpha(theme.palette.primary.main, 0.3), padding: theme.spacing(2)}}>
+        <Typography variant="h4" component="h1"sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
           Workers
         </Typography>
         <Button 
@@ -58,12 +61,12 @@ export function WorkersPage() {
 
       {unassignedWorkers && unassignedWorkers.length > 0 && (
         <SectionContainer>
-          <Typography variant="h5" gutterBottom>
+          <Typography variant="h5" gutterBottom sx={{color: theme.palette.primary.main}}>
             Unassigned Workers
           </Typography>
           <List>
             {unassignedWorkers.map((worker: WorkerResponse) => (
-              <ListItem 
+              <ListItem sx={{ border: `1px solid ${theme.palette.divider}`, borderRadius: 1, mb: 1 }}
                 key={worker.workerId}
                 secondaryAction={
                   <Box sx={{ display: 'flex', gap: 1 }}>
@@ -97,8 +100,8 @@ export function WorkersPage() {
         </SectionContainer>
       )}
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
-        <Typography variant="h5" gutterBottom sx={{ mt: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2,mb: 3, backgroundColor:alpha(theme.palette.primary.main, 0.1), padding: theme.spacing(2)}}>
+        <Typography variant="h5" sx={{color: theme.palette.primary.main }}>
           All Workers
         </Typography>
         <SearchBar query={query} setQuery={setQuery} />
@@ -121,7 +124,7 @@ export function WorkersPage() {
       >
         {filteredWorkers?.map((worker: WorkerResponse) => 
           <StyledCard key={worker.workerId}>
-              <CardContent>
+              <CardContent sx={{ border: `1px solid ${theme.palette.divider}`, borderRadius: 1, mb: 1 , backgroundColor: alpha(theme.palette.primary.main, 0.05) }}>
                 <Typography variant="h5" component="h2" gutterBottom>
                   {worker.name}
                 </Typography>

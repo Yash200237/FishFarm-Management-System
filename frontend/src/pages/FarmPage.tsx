@@ -96,10 +96,11 @@ export const FarmPage = () => {
           }
         )}
         <DetailCard>
-          <Typography variant="h3" component="h1" gutterBottom>
+          <Typography variant="h3" component="h1" gutterBottom sx={{textAlign: 'center'}}>
             {farm.name}
           </Typography>
-          
+
+          <Box sx={{ mb: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <InfoSection>
             <Typography variant="body1" color="text.secondary">
               <strong>Location:</strong> {farm.latitude}, {farm.longitude}
@@ -114,8 +115,6 @@ export const FarmPage = () => {
               <strong>Phone:</strong> {farm.phone ?  farm.phone : <i>Not Provided</i>}
             </Typography>
           </InfoSection>
-
-
           <Button variant="outlined" onClick={() => setOpenMap(true)}>
             <LocationOnIcon sx={{ mr: 1 }} />
             View on Map
@@ -132,9 +131,12 @@ export const FarmPage = () => {
               </Box>
             </DialogContent>
           </Dialog>
+          </Box>
+
+
 
           {farm.picture && (
-            <Box sx={{ mt: 2, mb: 2}}>
+            <Box sx={{ mt: 2, mb: 2, textAlign: 'center' }}>
               <img src={farm.picture} alt={farm.name} style={{ maxWidth: '100%', borderRadius: 8 }} />
             </Box>
           )}   

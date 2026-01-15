@@ -22,10 +22,14 @@ import Paper from '@mui/material/Paper';
 import { useState } from "react";
 import { DeleteAlertDialog } from "../components/DeleteAlertDialog";
 import { SearchBar } from "../components/SearchBar.tsx";
+import { alpha } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
+import { StyledTableCell } from "../styles/UsersPage.styles.ts";
 
 
 export function UsersPage() {
   const navigate = useNavigate();
+  const theme = useTheme();
   const queryClient = useQueryClient()
   const { currentUser } = useAuth();
   const [query, setQuery] = useState("");
@@ -89,13 +93,13 @@ export function UsersPage() {
         }
       )}
       <ProtectedWrapper allowedRoles={['OrgAdmin']}>
-          <Typography variant="h4" gutterBottom>
+          <Typography variant="h4" gutterBottom sx={{backgroundColor:alpha(theme.palette.primary.main, 0.3), padding: theme.spacing(2),fontWeight: 'bold', color: theme.palette.primary.main }}>
             Admin Users
           </Typography>
           <SectionContainer>
           <List>
             {admin_users?.map((user: User) => (
-              <ListItem 
+              <ListItem sx={{ border: `1px solid ${theme.palette.divider}`, borderRadius: 1, mb: 1 }}
                 key={user.userId}
                 secondaryAction={
                 <Typography color="text.secondary">
@@ -116,8 +120,8 @@ export function UsersPage() {
           </List>
         </SectionContainer>
       </ProtectedWrapper>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant="h4" component="h1">
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 ,backgroundColor:alpha(theme.palette.primary.main, 0.1), padding: theme.spacing(2)}}>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
             Org Users
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -139,11 +143,11 @@ export function UsersPage() {
       <TableContainer component={Paper} sx={{maxHeight: 350, mt:4}}>
             <Table aria-label="users table" stickyHeader>
               <TableHead>
-                <TableRow>
-                  <TableCell scope="col">Name</TableCell>
-                  <TableCell scope="col">Email</TableCell>
-                  <TableCell scope="col">Username</TableCell>
-                  <TableCell scope="col" >Actions</TableCell>
+                <TableRow >
+                  <StyledTableCell scope="col" >Name</StyledTableCell>
+                  <StyledTableCell scope="col">Email</StyledTableCell>
+                  <StyledTableCell scope="col">Username</StyledTableCell>
+                  <StyledTableCell scope="col" >Actions</StyledTableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

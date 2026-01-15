@@ -1,7 +1,7 @@
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
-import { useTheme } from '@mui/material/styles';
+import { alpha, useTheme } from '@mui/material/styles';
 import { useQuery } from 'react-query';
 import { fetchOrgById } from '../apis/orgsApis';
 import { useAuth } from '../contexts/AuthProviderHook';
@@ -31,11 +31,11 @@ export const HomePage = () => {
           <strong>{org?.name}</strong>
         </Typography>
         <Divider sx={{ my: 2 }} />
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2, backgroundColor:alpha(theme.palette.primary.main, 0.2), borderRadius:2}}>
           <img 
             src={org?.logo}
             alt="Fish Farm Logo" 
-            style={{ maxHeight: '250px' }} 
+            style={{ maxHeight: '250px',margin:10 }} 
           />
         </Box>
         <Divider sx={{ my: 2 }} />

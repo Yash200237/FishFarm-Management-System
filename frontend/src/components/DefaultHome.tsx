@@ -4,6 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import Divider from '@mui/material/Divider';
 import {Container} from '@mui/material'
 import Button from '@mui/material/Button'
+import { alpha } from '@mui/material/styles';
 
 interface DefaultHomeProps {
   isGlobalAdmin?: boolean;
@@ -19,7 +20,7 @@ export const DefaultHome = ({ isGlobalAdmin}: DefaultHomeProps) => {
         </Typography>
         <Divider sx={{ my: 2 }} />
         
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 , backgroundColor:alpha(theme.palette.primary.main, 0.2), borderRadius:2}}>
           <img 
             src="/img/logo.png" 
             alt="Fish Farm Logo" 
