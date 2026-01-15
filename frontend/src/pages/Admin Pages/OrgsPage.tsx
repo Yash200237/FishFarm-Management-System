@@ -13,11 +13,18 @@ import type { OrgResponse } from "../../types/org.ts";
 import { Avatar,Accordion,AccordionActions,AccordionSummary,AccordionDetails  } from "@mui/material";
 import { fetchOrgs } from "../../apis/orgsApis.ts";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useState } from "react";
+import { SearchBar } from "../../components/SearchBar.tsx";
 
 export function OrgsPage() {
   const navigate = useNavigate();
+  const [query, setQuery] = useState("");
   const {isLoading,isError,data:orgs,error} = useQuery<OrgResponse[], AxiosError>('orgs',fetchOrgs);
-  console.log(orgs);
+  const filteredOrgs = orgs?.filter(org => {
+    const name = (org.name ?? "").toLowerCase();
+    const q = query.trim().toLowerCase();
+    return q === "" || name.includes(q);
+  });
   
   if(isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
   if(isError){
@@ -30,6 +37,8 @@ export function OrgsPage() {
         <Typography variant="h3" component="h1">
           Organizations
         </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <SearchBar query={query} setQuery={setQuery} />
         <Button 
           variant="contained" 
           startIcon={<AddIcon />}
@@ -37,10 +46,11 @@ export function OrgsPage() {
         >
           Create New Organization
         </Button>
+        </Box>
       </Box>
 
       <Box>
-      {orgs?.map((org: OrgResponse) => 
+      {filteredOrgs?.map((org: OrgResponse) => 
       <Accordion key ={org.orgId}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1-content" id="panel1-header">
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

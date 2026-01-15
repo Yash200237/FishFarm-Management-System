@@ -21,12 +21,14 @@ import {Table,TableHead,TableRow,TableCell,TableBody, TableContainer, List, List
 import Paper from '@mui/material/Paper';
 import { useState } from "react";
 import { DeleteAlertDialog } from "../components/DeleteAlertDialog";
+import { SearchBar } from "../components/SearchBar.tsx";
 
 
 export function UsersPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient()
   const { currentUser } = useAuth();
+  const [query, setQuery] = useState("");
   const orgId = currentUser?.orgId;
   console.log("Org ID in UsersPage:", orgId);
 
@@ -36,6 +38,7 @@ export function UsersPage() {
   const {isLoading,isError,data:users,error} = useQuery<User[], AxiosError>(['users', orgId], async () => 
     await GetUsersByOrgId(orgId!)
 , { enabled: !!orgId } );
+
 
   const removeUserMutation = useMutation((userId: string) => DeleteUser(userId), {
     onSuccess: () => {
@@ -52,6 +55,12 @@ export function UsersPage() {
     if (!users || !Array.isArray(users)) return [];
     return users.filter(user => user.userRole !== 'OrgAdmin');
   }, [users]);
+
+  const filteredUsers = org_users?.filter(user => {
+    const name = (user.name ?? "").toLowerCase();
+    const q = query.trim().toLowerCase();
+    return q === "" || name.includes(q);
+  });
 
   if (!orgId) {
   return <Alert severity="info">Loading organization...</Alert>;
@@ -107,22 +116,24 @@ export function UsersPage() {
           </List>
         </SectionContainer>
       </ProtectedWrapper>
-
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h4" component="h1">
             Org Users
           </Typography>
-          <Button 
-          variant="contained" 
-          startIcon={<AddIcon />}
-          onClick={() => navigate(`/users/create/${orgId}`)}
-          disabled={!orgId}
-        >
-          Create New User
-        </Button>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <SearchBar query={query} setQuery={setQuery} />
+            <Button 
+              variant="contained" 
+              startIcon={<AddIcon />}
+              onClick={() => navigate(`/users/create/${orgId}`)}
+              disabled={!orgId}
+            >
+              Create New User
+            </Button>
+          </Box>
       </Box>
 
-      { org_users?.length === 0 ? (
+      { filteredUsers?.length === 0 ? (
         <Alert severity="info">No users available. Please create a new user.</Alert>
       ) : (
       <TableContainer component={Paper} sx={{maxHeight: 350, mt:4}}>
@@ -136,7 +147,7 @@ export function UsersPage() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {org_users?.map((user: User) => (
+                {filteredUsers?.map((user: User) => (
                   <TableRow key={user.userId}>
                     <TableCell component="th" scope="row">
                       {user.name}
