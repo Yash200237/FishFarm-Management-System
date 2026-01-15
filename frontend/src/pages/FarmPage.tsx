@@ -25,6 +25,7 @@ import { MapComponent } from "../components/MapComponent";
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 export const FarmPage = () => {
     const {farmId} = useParams<{farmId: string}>();
@@ -114,7 +115,9 @@ export const FarmPage = () => {
             </Typography>
           </InfoSection>
 
+
           <Button variant="outlined" onClick={() => setOpenMap(true)}>
+            <LocationOnIcon sx={{ mr: 1 }} />
             View on Map
           </Button>
           <Dialog open={openMap} onClose={() => setOpenMap(false)} maxWidth="md" fullWidth>
