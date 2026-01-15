@@ -21,6 +21,10 @@ import {PageContainer} from '../styles/Common.styles'
 import { ProtectedWrapper } from "../components/ProtectedWrapper";
 import { DeleteAlertDialog } from "../components/DeleteAlertDialog";
 import { useState } from "react";
+import { MapComponent } from "../components/MapComponent";
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
 
 export const FarmPage = () => {
     const {farmId} = useParams<{farmId: string}>();
@@ -36,6 +40,7 @@ export const FarmPage = () => {
       navigate("/farms")
     },
     })
+    const [openMap, setOpenMap] = useState(false);
     const [open,setOpen] = useState(false);
     const [openWorker,setOpenWorker] = useState(false);
     const [dialogWorkerId, setDialogWorkerId] = useState<string | null>(null);
@@ -109,11 +114,27 @@ export const FarmPage = () => {
             </Typography>
           </InfoSection>
 
+          <Button variant="outlined" onClick={() => setOpenMap(true)}>
+            View on Map
+          </Button>
+          <Dialog open={openMap} onClose={() => setOpenMap(false)} maxWidth="md" fullWidth>
+            <DialogTitle>Farm Location</DialogTitle>
+            <DialogContent>
+              <Box sx={{ height: 450 }}>
+                <MapComponent
+                  latitude={farm.latitude}
+                  longitude={farm.longitude}
+                  mode="view"
+                />
+              </Box>
+            </DialogContent>
+          </Dialog>
+
           {farm.picture && (
             <Box sx={{ mt: 2, mb: 2}}>
               <img src={farm.picture} alt={farm.name} style={{ maxWidth: '100%', borderRadius: 8 }} />
             </Box>
-          )}
+          )}   
 
           <Divider sx={{ my: 3 }} />
 
