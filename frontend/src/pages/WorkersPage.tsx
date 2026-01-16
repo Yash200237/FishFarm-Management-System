@@ -4,25 +4,25 @@ import { useNavigate } from "react-router-dom";
 import type { WorkerResponse } from "../types/worker.ts";
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
-import CardContent from '@mui/material/CardContent'
 import CardActions from '@mui/material/CardActions'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import Alert from '@mui/material/Alert'
 import List from '@mui/material/List'
-import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import Chip from '@mui/material/Chip'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
 import { SectionContainer } from '../styles/WorkersPage.styles.ts'
-import { PageContainer, StyledCard } from '../styles/Common.styles.ts'
+import { PageContainer, StyledCard, StyledCardContent, StyledGridBox, StyledHeading, StyledHeadingBar, StyledListItem } from '../styles/Common.styles.ts'
 import type { AxiosError } from "axios";
 import { SearchBar } from "../components/SearchBar.tsx";
 import { useState } from "react";
+import { useTheme } from "@mui/material/styles";
 
 export function WorkersPage() {
   const navigate = useNavigate();
+  const theme = useTheme();
   const [query, setQuery] = useState("");
 
   const {isLoading,isError,data:workers,error} = useQuery<WorkerResponse[], AxiosError>('workers',fetchWorkers);
@@ -43,10 +43,10 @@ export function WorkersPage() {
   
   return (
     <PageContainer>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1">
+      <StyledHeadingBar>
+        <StyledHeading variant="h4">
           Workers
-        </Typography>
+        </StyledHeading>
         <Button 
           variant="contained" 
           startIcon={<AddIcon />}
@@ -54,16 +54,16 @@ export function WorkersPage() {
         >
           Create New Worker
         </Button>
-      </Box>
+      </StyledHeadingBar>
 
       {unassignedWorkers && unassignedWorkers.length > 0 && (
         <SectionContainer>
-          <Typography variant="h5" gutterBottom>
+          <Typography variant="h5" gutterBottom sx={{color: theme.palette.primary.main}}>
             Unassigned Workers
           </Typography>
           <List>
             {unassignedWorkers.map((worker: WorkerResponse) => (
-              <ListItem 
+              <StyledListItem
                 key={worker.workerId}
                 secondaryAction={
                   <Box sx={{ display: 'flex', gap: 1 }}>
@@ -91,37 +91,27 @@ export function WorkersPage() {
                     </>
                   }
                 />
-              </ListItem>
+              </StyledListItem>
             ))}
           </List>
         </SectionContainer>
       )}
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
-        <Typography variant="h5" gutterBottom sx={{ mt: 3 }}>
+      <StyledHeadingBar>
+        <Typography variant="h5" sx={{color: theme.palette.primary.main }}>
           All Workers
         </Typography>
         <SearchBar query={query} setQuery={setQuery} />
-      </Box>
+      </StyledHeadingBar>
 
       {
         workers?.length === 0 &&
         <Alert severity="info">No workers available. Please create a new worker.</Alert>
       }
-      <Box 
-        sx={{ 
-          display: 'grid', 
-          gridTemplateColumns: { 
-            xs: '1fr', 
-            sm: 'repeat(2, 1fr)', 
-            md: 'repeat(3, 1fr)' 
-          }, 
-          gap: 3 
-        }}
-      >
+      <StyledGridBox>
         {filteredWorkers?.map((worker: WorkerResponse) => 
           <StyledCard key={worker.workerId}>
-              <CardContent>
+            <StyledCardContent>
                 <Typography variant="h5" component="h2" gutterBottom>
                   {worker.name}
                 </Typography>
@@ -131,7 +121,7 @@ export function WorkersPage() {
                 <Typography color="text.secondary">
                   Email: {worker.email}
                 </Typography>
-              </CardContent>
+              </StyledCardContent>
               <CardActions>
                 <Button size="small" onClick={() => navigate(`/workers/${worker.workerId}`)}>
                   View Details
@@ -139,7 +129,7 @@ export function WorkersPage() {
               </CardActions>
             </StyledCard>
         )}
-      </Box>
+      </StyledGridBox>
 
       <Fab 
         color="primary" 

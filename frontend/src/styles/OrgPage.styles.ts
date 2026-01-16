@@ -1,7 +1,6 @@
 import { styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
-import ListItem from '@mui/material/ListItem';
 
 export const PageContainer = styled(Box)({
   maxWidth: "100%",
@@ -23,8 +22,16 @@ export const InfoSection = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
-export const UserListItem = styled(ListItem)(({ theme }) => ({
-  border: `1px solid ${theme.palette.divider}`,
-  borderRadius: theme.shape.borderRadius,
-  marginBottom: theme.spacing(1),
+export const LogoContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: theme.spacing(2),
+  marginBottom: theme.spacing(2),
+}));
+
+export const LogoImage = styled('img')(() => ({
+  maxWidth: "300px",
+  maxHeight: "300px",
+  borderRadius: 8,
 }));

@@ -15,6 +15,7 @@ import { updateWorkerToFarm } from "../apis/wokersApis";
 import { useQuery } from "react-query";
 import { fetchWorkerToFarm } from "../apis/wokersApis";
 import CircularProgress from "@mui/material/CircularProgress";
+import { StyledEditBox } from "../styles/Common.styles";
 
 export const WorkerAssignEditPage = () => {
     const {workerId} = useParams<{workerId: string}>();
@@ -64,7 +65,7 @@ if (!workerId || !farmId) return <Alert severity="warning">Missing worker id or 
                 Assign Worker to Farm
             </Typography>
 
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 3 }}>
+            <StyledEditBox>
 
                 {errorMessage && (
                     <Alert severity="error">
@@ -113,7 +114,7 @@ if (!workerId || !farmId) return <Alert severity="warning">Missing worker id or 
                             Cancel
                         </Button>
                 </ButtonGroup>
-            </Box>
+            </StyledEditBox>
         </Paper>
     </Container>
     )

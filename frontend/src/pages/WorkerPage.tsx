@@ -18,8 +18,8 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EmailIcon from '@mui/icons-material/Email'
 import PhoneIcon from '@mui/icons-material/Phone'
-import { ProfileCard, ProfileHeader, StyledAvatar, InfoSection, FarmListItem } from '../styles/WorkerPage.styles'
-import { PageContainer} from '../styles/Common.styles'
+import { ProfileCard, ProfileHeader, StyledAvatar, InfoSection } from '../styles/WorkerPage.styles'
+import { ChipContainer, PageContainer, StyledListItem} from '../styles/Common.styles'
 import { useState } from "react";
 import { DeleteAlertDialog } from "../components/DeleteAlertDialog";
 
@@ -123,7 +123,7 @@ export const WorkerPage = () => {
           ) : (
             <List>
               {farms.map((farm:FarmWDetailsDto) =>
-                <FarmListItem
+                <StyledListItem
                   key={farm.farmId}
                   secondaryAction={
                     <Box sx={{ display: 'flex', gap: 1 }}>
@@ -152,16 +152,16 @@ export const WorkerPage = () => {
                   <ListItemText
                     primary={farm.farmName}
                     secondary={
-                      <Box sx={{ mt: 0.5, display: 'flex', gap: 1 }}>
+                      <ChipContainer>
                         <Chip label={farm.role} size="small" color="primary" />
                         <Chip 
                           label={`Until: ${farm.certifiedUntil ?? "N/A"}`}
                           size="small" 
                         />
-                      </Box>
+                      </ChipContainer>
                     }
                   />
-                </FarmListItem>
+                </StyledListItem>
               )}
             </List>
           )}

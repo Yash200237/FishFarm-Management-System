@@ -12,6 +12,8 @@ import Checkbox from '@mui/material/Checkbox'
 import { StyledPaper, StyledForm } from '../styles/Common.styles'
 import type { FarmSchema } from "../schemas/farmSchemas";
 import { farmSchema } from "../schemas/farmSchemas";
+import { MapComponent } from "../components/MapComponent";
+import Box from "@mui/material/Box";
 
 
 export function FarmCreateForm(){
@@ -122,6 +124,7 @@ export function FarmCreateForm(){
                 }}
                 fullWidth
             />
+            
         );
     }
 
@@ -149,6 +152,24 @@ export function FarmCreateForm(){
                 )}
 
                 {fields.map(renderField)}
+                <Box sx={{ mt: 2, mb: 2 }}>
+                <Typography variant="subtitle1" gutterBottom>
+                    Select Farm Location
+                </Typography>
+
+                <MapComponent
+                    latitude={farm.Latitude}
+                    longitude={farm.Longitude}
+                    mode="select"
+                    onLocationChange={(lat, lng) => {
+                    setFarm(prev => ({
+                        ...prev,
+                        Latitude: round4(lat),
+                        Longitude: round4(lng),
+                    }));
+                    }}
+                />
+                </Box>
                 
                 <Button type="submit" variant="contained" fullWidth>
                     Create Farm

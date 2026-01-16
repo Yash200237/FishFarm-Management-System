@@ -7,7 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Alert from '@mui/material/Alert'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
-import { PageContainer } from '../styles/Common.styles.ts'
+import { PageContainer, StyledContainerBar, StyledHeading, StyledHeadingBar, StyledListItem } from '../styles/Common.styles.ts'
 import { SectionContainer } from '../styles/WorkersPage.styles.ts'
 import type { AxiosError } from "axios";
 import { ProtectedWrapper } from "../components/ProtectedWrapper.tsx";
@@ -17,11 +17,12 @@ import { useMemo } from "react";
 import { useAuth } from "../contexts/AuthProviderHook.ts";
 import { useMutation, useQueryClient } from "react-query"
 import { DeleteUser } from "../apis/userApis.ts";
-import {Table,TableHead,TableRow,TableCell,TableBody, TableContainer, List, ListItem, ListItemText, Chip} from '@mui/material';
+import {Table,TableHead,TableRow,TableCell,TableBody, TableContainer, List, ListItemText, Chip} from '@mui/material';
 import Paper from '@mui/material/Paper';
 import { useState } from "react";
 import { DeleteAlertDialog } from "../components/DeleteAlertDialog";
 import { SearchBar } from "../components/SearchBar.tsx";
+import { StyledTableCell } from "../styles/UsersPage.styles.ts";
 
 
 export function UsersPage() {
@@ -89,13 +90,15 @@ export function UsersPage() {
         }
       )}
       <ProtectedWrapper allowedRoles={['OrgAdmin']}>
-          <Typography variant="h4" gutterBottom>
+        <StyledHeadingBar>
+          <StyledHeading variant="h4">
             Admin Users
-          </Typography>
+          </StyledHeading>
+        </StyledHeadingBar>
           <SectionContainer>
           <List>
             {admin_users?.map((user: User) => (
-              <ListItem 
+              <StyledListItem
                 key={user.userId}
                 secondaryAction={
                 <Typography color="text.secondary">
@@ -111,16 +114,16 @@ export function UsersPage() {
                     </>
                   }
                 />
-              </ListItem>
+              </StyledListItem>
             ))}
           </List>
         </SectionContainer>
       </ProtectedWrapper>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant="h4" component="h1">
+      <StyledHeadingBar>
+          <StyledHeading variant="h4">
             Org Users
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          </StyledHeading>
+          <StyledContainerBar>
             <SearchBar query={query} setQuery={setQuery} />
             <Button 
               variant="contained" 
@@ -130,8 +133,8 @@ export function UsersPage() {
             >
               Create New User
             </Button>
-          </Box>
-      </Box>
+          </StyledContainerBar>
+      </StyledHeadingBar>
 
       { filteredUsers?.length === 0 ? (
         <Alert severity="info">No users available. Please create a new user.</Alert>
@@ -139,11 +142,11 @@ export function UsersPage() {
       <TableContainer component={Paper} sx={{maxHeight: 350, mt:4}}>
             <Table aria-label="users table" stickyHeader>
               <TableHead>
-                <TableRow>
-                  <TableCell scope="col">Name</TableCell>
-                  <TableCell scope="col">Email</TableCell>
-                  <TableCell scope="col">Username</TableCell>
-                  <TableCell scope="col" >Actions</TableCell>
+                <TableRow >
+                  <StyledTableCell scope="col" >Name</StyledTableCell>
+                  <StyledTableCell scope="col">Email</StyledTableCell>
+                  <StyledTableCell scope="col">Username</StyledTableCell>
+                  <StyledTableCell scope="col" >Actions</StyledTableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -155,7 +158,7 @@ export function UsersPage() {
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.userName}</TableCell>
                     <TableCell >
-                      <Box sx={{ display: 'flex', gap: 1 }}>
+                    <StyledContainerBar>
                     <Button 
                       size="small" 
                       onClick={() => navigate(`/users/${orgId}/${user.userId}/edit`)}
@@ -170,7 +173,7 @@ export function UsersPage() {
                     >
                       {removeUserMutation.isLoading ? "Removing..." : "Remove"}
                     </Button>
-                  </Box>
+                  </StyledContainerBar>
                     </TableCell>
                   </TableRow>
                 ))}

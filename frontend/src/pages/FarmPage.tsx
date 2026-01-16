@@ -16,11 +16,16 @@ import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { DetailCard, InfoSection, WorkerListItem } from '../styles/FarmPage.styles'
-import {PageContainer} from '../styles/Common.styles'
+import { DetailCard, InfoSection } from '../styles/FarmPage.styles'
+import {ChipContainer, PageContainer, StyledListItem} from '../styles/Common.styles'
 import { ProtectedWrapper } from "../components/ProtectedWrapper";
 import { DeleteAlertDialog } from "../components/DeleteAlertDialog";
 import { useState } from "react";
+import { MapComponent } from "../components/MapComponent";
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 export const FarmPage = () => {
     const {farmId} = useParams<{farmId: string}>();
@@ -36,6 +41,7 @@ export const FarmPage = () => {
       navigate("/farms")
     },
     })
+    const [openMap, setOpenMap] = useState(false);
     const [open,setOpen] = useState(false);
     const [openWorker,setOpenWorker] = useState(false);
     const [dialogWorkerId, setDialogWorkerId] = useState<string | null>(null);
@@ -90,10 +96,11 @@ export const FarmPage = () => {
           }
         )}
         <DetailCard>
-          <Typography variant="h3" component="h1" gutterBottom>
+          <Typography variant="h3" component="h1" gutterBottom sx={{textAlign: 'center'}}>
             {farm.name}
           </Typography>
-          
+
+          <Box sx={{ mb: 2, display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <InfoSection>
             <Typography variant="body1" color="text.secondary">
               <strong>Location:</strong> {farm.latitude}, {farm.longitude}
@@ -108,12 +115,31 @@ export const FarmPage = () => {
               <strong>Phone:</strong> {farm.phone ?  farm.phone : <i>Not Provided</i>}
             </Typography>
           </InfoSection>
+          <Button variant="outlined" onClick={() => setOpenMap(true)}>
+            <LocationOnIcon sx={{ mr: 1 }} />
+            View on Map
+          </Button>
+          <Dialog open={openMap} onClose={() => setOpenMap(false)} maxWidth="md" fullWidth>
+            <DialogTitle>Farm Location</DialogTitle>
+            <DialogContent>
+              <Box sx={{ height: 450 }}>
+                <MapComponent
+                  latitude={farm.latitude}
+                  longitude={farm.longitude}
+                  mode="view"
+                />
+              </Box>
+            </DialogContent>
+          </Dialog>
+          </Box>
+
+
 
           {farm.picture && (
-            <Box sx={{ mt: 2, mb: 2}}>
+            <Box sx={{ mt: 2, mb: 2, textAlign: 'center' }}>
               <img src={farm.picture} alt={farm.name} style={{ maxWidth: '100%', borderRadius: 8 }} />
             </Box>
-          )}
+          )}   
 
           <Divider sx={{ my: 3 }} />
 
@@ -136,7 +162,7 @@ export const FarmPage = () => {
           ) : (
             <List>
               {workers.map((worker:FarmWorkerDetails) => 
-                <WorkerListItem
+                <StyledListItem
                   key={worker.workerId}
                   secondaryAction={
                     <Box sx={{ display: 'flex', gap: 1 }}>
@@ -169,17 +195,17 @@ export const FarmPage = () => {
                         <Typography variant="body2" color="text.secondary">
                           {worker.workerEmail}
                         </Typography>
-                        <Box sx={{ mt: 0.5, display: 'flex', gap: 1 }}>
+                        <ChipContainer>
                           <Chip label={worker.role} size="small" color="primary" />
                           <Chip 
                             label={`Until: ${worker.certifiedUntil ?? "N/A"}`}
                             size="small" 
                           />
-                        </Box>
+                        </ChipContainer>
                       </Box>
                     }
                   />
-                </WorkerListItem>
+                </StyledListItem>
               )}
             </List>
           )}
