@@ -14,6 +14,7 @@ import MenuItem from '@mui/material/MenuItem'
 import { assignSchema, type AssignSchema } from "../schemas/workerSchemas";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import type { WorkerResponse } from "../types/worker";
+import { StyledEditBox } from "../styles/Common.styles";
 
 export const FarmWorkerAssignPage = () => {
     const {farmId} = useParams<{farmId: string}>();
@@ -52,7 +53,7 @@ export const FarmWorkerAssignPage = () => {
                 Assign Worker to Farm
             </Typography>
 
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 3 }}>
+            <StyledEditBox>
 
                 {errorMessage && (
                     <Alert severity="error">
@@ -117,7 +118,7 @@ export const FarmWorkerAssignPage = () => {
                             Skip for later
                         </Button>
                 </ButtonGroup>
-            </Box>
+            </StyledEditBox>
         </Paper>
     </Container>
     )

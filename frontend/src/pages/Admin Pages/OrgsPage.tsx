@@ -7,18 +7,18 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Alert from '@mui/material/Alert'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
-import { PageContainer } from '../../styles/Common.styles.ts'
+import { PageContainer, StyledContainerBar, StyledHeading, StyledHeadingBar } from '../../styles/Common.styles.ts'
 import type { AxiosError } from "axios";
 import type { OrgResponse } from "../../types/org.ts";
-import { Avatar,Accordion,AccordionActions,AccordionSummary,AccordionDetails, alpha, useTheme  } from "@mui/material";
+import { Avatar,Accordion,AccordionActions,AccordionSummary,AccordionDetails  } from "@mui/material";
 import { fetchOrgs } from "../../apis/orgsApis.ts";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState } from "react";
 import { SearchBar } from "../../components/SearchBar.tsx";
+import { DescriptionText } from "../../styles/OrgsPage.styles.ts";
 
 export function OrgsPage() {
   const navigate = useNavigate();
-  const theme = useTheme();
   const [query, setQuery] = useState("");
   const {isLoading,isError,data:orgs,error} = useQuery<OrgResponse[], AxiosError>('orgs',fetchOrgs);
   const filteredOrgs = orgs?.filter(org => {
@@ -31,14 +31,14 @@ export function OrgsPage() {
   if(isError){
      return <Alert severity="error">{error instanceof Error ? error?.response?.status === 401 ? 'Please login to continue' : error.message : 'An error occurred'}</Alert>;
   }
-  
+
   return (
     <PageContainer>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, backgroundColor:alpha(theme.palette.primary.main, 0.3), padding: theme.spacing(2)  }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
+      <StyledHeadingBar>
+        <StyledHeading variant="h4">
           Organizations
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        </StyledHeading>
+        <StyledContainerBar>
         <SearchBar query={query} setQuery={setQuery} />
         <Button 
           variant="contained" 
@@ -47,24 +47,24 @@ export function OrgsPage() {
         >
           Create New Organization
         </Button>
-        </Box>
-      </Box>
+        </StyledContainerBar>
+      </StyledHeadingBar>
 
       <Box>
       {filteredOrgs?.map((org: OrgResponse) => 
       <Accordion key ={org.orgId}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1-content" id="panel1-header">
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <StyledContainerBar>
                   <Avatar src={org.logo} alt={org.name} sx={{ width: 56, height: 56 }} />
                   <Typography variant="h6" component="h2" gutterBottom>
                     {org.name}
                   </Typography>     
-          </Box>
+          </StyledContainerBar>
         </AccordionSummary>
         <AccordionDetails>
-              <Typography variant="body1" component="p" sx={{padding:2, backgroundColor: alpha(theme.palette.primary.main, 0.1) }} >
+              <DescriptionText>
                     {org.description}
-                  </Typography>
+              </DescriptionText>
         </AccordionDetails>
         <AccordionActions sx={{marginRight:2, marginBottom:1}}>
               <Button size="small" onClick={() => navigate(`/orgs/${org.orgId}`)}>

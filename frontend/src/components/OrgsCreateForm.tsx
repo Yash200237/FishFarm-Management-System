@@ -55,7 +55,6 @@ export function OrgsCreateForm(){
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) =>{
         e.preventDefault();
         const result = orgSchema.safeParse(org);
-        //console.log("validation result:", result);
         if(result.success){
             await createOrgMutation.mutateAsync(org);
             setOrg({

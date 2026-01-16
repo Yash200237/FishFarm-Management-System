@@ -15,12 +15,12 @@ export const MapComponent = ({ latitude, longitude,  mode = "view",onLocationCha
   const position = { lat: latitude, lng: longitude };
   const [open, setOpen] = useState(false);
   return (
-    <APIProvider apiKey="AIzaSyA-3aJuP4PLiFtOEueGJaxIl2p4xgwv1mM">
+    <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
     <Box sx={{ width: "100%", height: 450, boxSizing: "border-box" }}>
         <Map defaultZoom={5} 
              defaultCenter={position} 
              style={{ width: "100%", height: "100%" }} 
-             mapId="8cdd78b373595081ddb95318"
+             mapId={import.meta.env.VITE_MAP_ID}
              onClick={(e) => {
                 if (mode !== "select") return;
 

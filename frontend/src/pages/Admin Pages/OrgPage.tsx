@@ -15,21 +15,22 @@ import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { PageContainer, DetailCard, InfoSection, UserListItem } from '../../styles/OrgPage.styles.ts'
+import { PageContainer, DetailCard, InfoSection, LogoContainer } from '../../styles/OrgPage.styles.ts'
 import { ProtectedWrapper } from "../../components/ProtectedWrapper.tsx";
 import type { User } from "../../types/user.ts";
 import Grid from '@mui/material/Grid';
 import { useState } from "react";
 import { DeleteAlertDialog } from "../../components/DeleteAlertDialog";
 import type { AxiosError } from "axios";
-
+import {StyledListItem} from '../../styles/Common.styles.ts'
+import { LogoImage } from "../../styles/OrgPage.styles.ts";
+import {StyledHeadingBar,ChipContainer} from '../../styles/Common.styles.ts'
 
 export const OrgPage = () => {
     const {orgId} = useParams<{orgId: string}>();
     const navigate = useNavigate();
     const queryClient = useQueryClient()
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    console.log("Org ID:", orgId);
     const {isLoading,isError,data:org,error} = useQuery(['orgs',orgId],() => fetchOrgById(orgId!),{ enabled: !!orgId });
     const deleteOrgMutation = useMutation(DeleteOrg, {
       onSuccess: async() => {
@@ -46,8 +47,6 @@ export const OrgPage = () => {
 
     const {isLoading:isUsersLoading,isError:isUsersError,data:users} = useQuery<User[]>(['org_users',orgId],() => GetAdminUsersByOrgId(orgId!),
     { enabled: !!orgId });
-    console.log("users value:", users)
-    console.log("isArray:", Array.isArray(users))
     const removeUserMutation = useMutation<void, AxiosError, string>((userId: string) => DeleteUser(userId), {
       onSuccess: () => {
         queryClient.invalidateQueries(['org_users', orgId])
@@ -118,9 +117,9 @@ export const OrgPage = () => {
           </InfoSection>
 
           {org.logo && (
-            <Box sx={{ mt: 2, mb: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <img src={org.logo} alt={org.name} style={{ maxWidth:"300px", maxHeight:"300px", borderRadius: 8 }} />
-            </Box>
+            <LogoContainer>
+              <LogoImage src={org.logo} alt={org.name} />
+            </LogoContainer>
           )}
 
           <Divider sx={{ my: 3 }} />
@@ -147,18 +146,17 @@ export const OrgPage = () => {
 
           <Grid size={6}>
             <DetailCard>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="h5" gutterBottom>
+            <StyledHeadingBar>
+            <Typography variant="h5">
             Admin Users
             </Typography>
             <Button 
               variant="contained" 
-              sx={{ mb: 2 }}
               onClick={() => navigate(`/orgs/${orgId}/users/create`)}
             >
               Add New Admin User
             </Button>
-          </Box>
+          </StyledHeadingBar>
 
           
           {users.length === 0 ? (
@@ -166,7 +164,7 @@ export const OrgPage = () => {
           ) : (
             <List>
               {users.map((user:User) =>
-                <UserListItem
+                <StyledListItem
                   key={user.userId}
                   secondaryAction={
                     <Box sx={{ display: 'flex', gap: 1 }}>
@@ -194,17 +192,17 @@ export const OrgPage = () => {
                         <Typography variant="body2" color="text.secondary">
                           {user.email}
                         </Typography>
-                        <Box sx={{ mt: 0.5, display: 'flex', gap: 1 }}>
+                        <ChipContainer>
                           <Chip label={user.userRole} size="small" color="primary" />
                           <Chip 
                             label={`${user.userName}`}
                             size="small" 
                           />
-                        </Box>
+                        </ChipContainer>
                       </Box>
                     }
                   />
-                </UserListItem>
+                </StyledListItem>
               )}
             </List>
           )}

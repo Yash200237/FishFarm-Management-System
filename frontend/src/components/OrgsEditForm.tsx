@@ -78,7 +78,6 @@ export function OrgsEditForm(){
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) =>{
         e.preventDefault();
         const result = orgSchema.safeParse(org);
-        //console.log("validation result:", result);
         if(result.success){
             await editOrgMutation.mutateAsync(
                 {
@@ -114,7 +113,6 @@ export function OrgsEditForm(){
                 return
             }
             const base64 = await fileToBase64(file)
-            console.log(base64)
             setOrg(prev => ({ ...prev, Logo: base64 }))
         }
 
@@ -124,7 +122,7 @@ export function OrgsEditForm(){
         <StyledPaper elevation={3}>
             <StyledForm onSubmit={handleSubmit}>
                 <Typography variant="h4" component="h2" gutterBottom>
-                    Create Organization
+                    Edit Organization
                 </Typography>
 
                 {editOrgMutation.isLoading && <CircularProgress />}

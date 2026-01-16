@@ -16,8 +16,8 @@ import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { DetailCard, InfoSection, WorkerListItem } from '../styles/FarmPage.styles'
-import {PageContainer} from '../styles/Common.styles'
+import { DetailCard, InfoSection } from '../styles/FarmPage.styles'
+import {ChipContainer, PageContainer, StyledListItem} from '../styles/Common.styles'
 import { ProtectedWrapper } from "../components/ProtectedWrapper";
 import { DeleteAlertDialog } from "../components/DeleteAlertDialog";
 import { useState } from "react";
@@ -162,7 +162,7 @@ export const FarmPage = () => {
           ) : (
             <List>
               {workers.map((worker:FarmWorkerDetails) => 
-                <WorkerListItem
+                <StyledListItem
                   key={worker.workerId}
                   secondaryAction={
                     <Box sx={{ display: 'flex', gap: 1 }}>
@@ -195,17 +195,17 @@ export const FarmPage = () => {
                         <Typography variant="body2" color="text.secondary">
                           {worker.workerEmail}
                         </Typography>
-                        <Box sx={{ mt: 0.5, display: 'flex', gap: 1 }}>
+                        <ChipContainer>
                           <Chip label={worker.role} size="small" color="primary" />
                           <Chip 
                             label={`Until: ${worker.certifiedUntil ?? "N/A"}`}
                             size="small" 
                           />
-                        </Box>
+                        </ChipContainer>
                       </Box>
                     }
                   />
-                </WorkerListItem>
+                </StyledListItem>
               )}
             </List>
           )}

@@ -2,17 +2,15 @@ import { useQuery } from "react-query"
 import { fetchFarms } from "../apis/farmsApis";
 import type {FarmResponse} from "../types/farm.ts";
 import { useNavigate } from "react-router-dom";
-import { alpha, useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
-import CardContent from '@mui/material/CardContent'
 import CardActions from '@mui/material/CardActions'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import Alert from '@mui/material/Alert'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
-import { PageContainer, StyledCard } from '../styles/Common.styles.ts'
+import { PageContainer, StyledCard, StyledCardContent, StyledContainerBar, StyledGridBox, StyledHeading, StyledHeadingBar } from '../styles/Common.styles.ts'
 import type { AxiosError } from "axios";
 import { ProtectedWrapper } from "../components/ProtectedWrapper.tsx";
 import { SearchBar } from "../components/SearchBar.tsx";
@@ -20,7 +18,6 @@ import { useState } from "react";
 
 export function FarmsPage() {
   const navigate = useNavigate();
-  const theme = useTheme();
   const [query, setQuery] = useState("");
 
   const {isLoading,isError,data:farms,error} = useQuery<FarmResponse[], AxiosError>('farms',fetchFarms);
@@ -37,11 +34,11 @@ export function FarmsPage() {
   
   return (
     <PageContainer>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, backgroundColor:alpha(theme.palette.primary.main, 0.3), padding: theme.spacing(2) } }>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
+      <StyledHeadingBar>
+        <StyledHeading variant="h4">
           Farms
-        </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        </StyledHeading>
+          <StyledContainerBar>
             <SearchBar query={query} setQuery={setQuery} />
             <ProtectedWrapper allowedRoles={['OrgAdmin']}>
             <Button 
@@ -52,26 +49,16 @@ export function FarmsPage() {
               Create New Farm
             </Button>
             </ProtectedWrapper>
-          </Box>
-      </Box>
+          </StyledContainerBar>
+      </StyledHeadingBar>
       {
         farms?.length === 0 &&
         <Alert severity="info">No farms available. Please create a new farm.</Alert>
       }
-      <Box 
-        sx={{ 
-          display: 'grid', 
-          gridTemplateColumns: { 
-            xs: '1fr', 
-            sm: 'repeat(2, 1fr)', 
-            md: 'repeat(3, 1fr)' 
-          }, 
-          gap: 3 
-        }}
-      >
+      <StyledGridBox>
         {filteredFarms?.map((farm: FarmResponse) => 
           <StyledCard key={farm.farmId}>
-              <CardContent sx={{ border: `1px solid ${theme.palette.divider}`, borderRadius: 1, mb: 1 , backgroundColor: alpha(theme.palette.primary.main, 0.05) }}>
+              <StyledCardContent>
                 <Typography variant="h5" component="h2" gutterBottom>
                   {farm.name}
                 </Typography>
@@ -81,7 +68,7 @@ export function FarmsPage() {
                 <Typography color="text.secondary">
                   Barge: {farm.hasBarge ? 'Yes' : 'No'}
                 </Typography>
-              </CardContent>
+              </StyledCardContent>
               <CardActions>
                 <Button size="small" onClick={() => navigate(`/farms/${farm.farmId}`)}>
                   View Details
@@ -89,7 +76,7 @@ export function FarmsPage() {
               </CardActions>
             </StyledCard>
         )}
-      </Box>
+      </StyledGridBox>
 
       <ProtectedWrapper allowedRoles={['OrgAdmin']}>
       <Fab 

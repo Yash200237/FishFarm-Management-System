@@ -1,5 +1,6 @@
-import { styled } from '@mui/material/styles';
+import { alpha, styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
+import Typography from '@mui/material/Typography';  
 
 export const StyledCard = styled(Card)(({ theme }) => ({
   display: 'flex',
@@ -10,5 +11,10 @@ export const StyledCard = styled(Card)(({ theme }) => ({
     transform: 'translateY(-4px)',
     boxShadow: theme.shadows[8],
   },
+}));
+
+export const DescriptionText = styled(Typography)(({ theme }) => ({
+  padding: theme.spacing(2),
+  backgroundColor: alpha(theme.palette.primary.main, 0.1)
 }));
 
