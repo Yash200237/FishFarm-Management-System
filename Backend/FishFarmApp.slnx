@@ -2,5 +2,6 @@
   <Project Path="App.Application/App.Application.csproj" />
   <Project Path="App.Domain/App.Domain.csproj" />
   <Project Path="App.Infrastructure/App.Infrastructure.csproj" />
+  <Project Path="Application.Tests/App.Application.Tests.csproj" Id="0e5ad710-50b8-4ddb-993c-97b3d8b256bc" />
   <Project Path="FishFarmApp/FishFarmApp.csproj" />
 </Solution>

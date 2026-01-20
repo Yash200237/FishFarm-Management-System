@@ -35,8 +35,8 @@ namespace App.Application.Services
             {
                 FarmId = Guid.NewGuid(),
                 Name = createFarmDto.Name.Trim(),
-                Longitude = Convert.ToDecimal(createFarmDto.Longitude),
-                Latitude = Convert.ToDecimal(createFarmDto.Latitude),
+                Longitude = createFarmDto.Longitude,
+                Latitude = createFarmDto.Latitude,
                 NoOfCages = createFarmDto.NoOfCages,
                 HasBarge = createFarmDto.HasBarge,
                 OrgId = orgId

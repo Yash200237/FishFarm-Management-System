@@ -7,8 +7,8 @@
         public decimal Longitude { get; set; }
         public decimal Latitude { get; set; }
         public int NoOfCages { get; set; }
-        public string Picture { get; set; } = null!;
+        public string? Picture { get; set; }
         public bool HasBarge { get; set; }
-        public string Phone { get; set; } = null!;
+        public string? Phone { get; set; } 
     }
 }
