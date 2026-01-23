@@ -62,6 +62,21 @@ namespace FishFarmApp.Controllers
                 return Ok(unasignedWorkersToFarm);
         }
 
+        [Authorize(Policy = "RequireOrgMember")]
+        [HttpGet("farm/unassigned/{workerId}")]
+        public async Task<ActionResult<IEnumerable<WorkerResponseDto>>> GetUnassignedFarmsOfWorker(Guid workerId)
+        {
+            var orgClaimValue = User.FindFirst("OrgId")?.Value;
+            if (string.IsNullOrWhiteSpace(orgClaimValue))
+                return Forbid();
+
+            if (!Guid.TryParse(orgClaimValue, out var orgId))
+                return Forbid();
+
+            var UnassignedFarmsOfWorker = await _farmWorkerService.GetFarmsUnassignedForWorker(orgId, workerId);
+            return Ok(UnassignedFarmsOfWorker);
+        }
+
 
         [Authorize(Policy = "RequireOrgMember")]
         [HttpGet("{FarmId}/{WorkerId}")]

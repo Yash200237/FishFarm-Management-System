@@ -12,6 +12,7 @@ import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'
 import { StyledPaper, StyledForm } from '../styles/Common.styles'
 import { orgSchema, type OrgSchema } from "../schemas/orgSchemas";
 import { fileToBase64, validateImageFile } from "../utils/file";
+import { ErrorMessage} from "./ErrorMessage";
 
 
 export function OrgsCreateForm(){
@@ -20,6 +21,10 @@ export function OrgsCreateForm(){
             label:string;
             type: string;
     }
+
+    type ValidationErrorType = Partial<Record<keyof OrgSchema, string>>;
+        
+
     const fields : FieldConfig[] = [
         {key:"Name", label:"Organization Name",type:"text"},
         {key:"Description", label:"Description",type:"text"},
@@ -34,7 +39,8 @@ export function OrgsCreateForm(){
 
     const queryClient = useQueryClient()
     const navigate = useNavigate();
-    const[errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [validationError, setValidationError] = useState<ValidationErrorType>({});
+
 
     const createOrgMutation = useMutation(CreateOrg, {
         onSuccess: () => {
@@ -42,7 +48,21 @@ export function OrgsCreateForm(){
             navigate("/orgs");
         },
     })
-
+    const validateField = (key : keyof OrgSchema, value: OrgSchema[keyof OrgSchema]) =>{
+        const field = orgSchema.shape[key].safeParse(value);
+        if(field.success){
+            setValidationError(prev => {
+                const newErrors = {...prev};
+                delete newErrors[key];
+                return newErrors;
+            });
+        } else {
+            setValidationError(prev => ({
+                ...prev,
+                [key]: ErrorMessage({path: [String(field.error.issues[0].path[0])], message: field.error.issues[0].message})
+            }));
+        }
+    }
     const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) =>{
         const {name,value} = e.target;
         const key = name as keyof OrgSchema;
@@ -50,6 +70,8 @@ export function OrgsCreateForm(){
             ...prev,
             [key]: value
         }))
+
+        validateField(key,value);
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) =>{
@@ -62,16 +84,14 @@ export function OrgsCreateForm(){
                 Description:"",
                 Logo: "",
             })
-            setErrorMessage(null);
+            setValidationError({});
             navigate("/orgs");
         } else {
-            if (result.error.issues[0].path[0] === "Name"){
-                setErrorMessage(result.error.issues[0].message);
-            }
-            else{
-            setErrorMessage(result.error.issues[0].path + " : " + result.error.issues[0].message);                                                                                                                       
-            }
-            console.error(result.error.issues);
+            setValidationError(prev => ({
+                ...prev,
+                [String(result.error.issues[0].path[0])]: ErrorMessage({path: [String(result.error.issues[0].path[0])], message: result.error.issues[0].message})
+            }));
+
         }
     }
 
@@ -108,12 +128,6 @@ export function OrgsCreateForm(){
                     </Alert>
                 )}
 
-                {errorMessage && (
-                    <Alert severity="error">
-                        {errorMessage}
-                    </Alert>
-                )}
-
                 {fields.map(field => {
                         if (field.type === "file") {
                             return <Box key={field.key} sx={{ mb: 2 }}>
@@ -142,6 +156,8 @@ export function OrgsCreateForm(){
                         value={String(org[field.key])}
                         onChange={handleChangeInput}
                     fullWidth
+                    error={Boolean(validationError[field.key])}
+                    helperText={validationError[field.key]}
                     />
                     }
                 })          

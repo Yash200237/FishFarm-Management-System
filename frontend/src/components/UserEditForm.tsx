@@ -10,25 +10,33 @@ import CircularProgress from '@mui/material/CircularProgress'
 import { StyledPaper, StyledForm } from '../styles/Common.styles'
 import type { UserSchema } from "../schemas/userSchemas";
 import type { UserRoles } from "../types/user";
-import { userEditSchema } from "../schemas/userSchemas";
+import { userEditSchema, userSchema } from "../schemas/userSchemas";
 import Box from "@mui/material/Box";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import type { EditUserForm } from "../types/user";
+import { ErrorMessage } from "./ErrorMessage";
 
 
 
 export function UserEditForm(userRoleProp: {value: UserRoles}){
+    type FieldType = "text" | "email" | "password";
+
     type FieldConfig = {
             key: keyof UserSchema;
             label:string;
+            type:FieldType;
+            
     }
+
+    type ValidationErrorType = Partial<Record<keyof UserSchema, string>>;
+    
     const fields : FieldConfig[] = [
-        {key:"Name", label:"Full Name"},
-        {key:"Email", label:"Email"},
-        {key:"UserName", label:"Username"},
-        {key:"Password", label:"New Password"},
-        {key:"ConfirmPassword", label:"Confirm Password"},
-        {key:"UserRole", label:"User Role"},
+        {key:"Name", label:"Full Name",type:"text"},
+        {key:"Email", label:"Email",type:"email"},
+        {key:"UserName", label:"Username",type:"text"},
+        {key:"Password", label:"New Password",type:"password"},
+        {key:"ConfirmPassword", label:"Confirm Password",type:"password"},
+        {key:"UserRole", label:"User Role",type:"text"},
     ]
     const {orgId} = useParams<{orgId: string}>();
     const {userId} = useParams<{userId: string}>();
@@ -53,7 +61,7 @@ export function UserEditForm(userRoleProp: {value: UserRoles}){
 
     const queryClient = useQueryClient()
     const navigate = useNavigate();
-    const[errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [validationError, setValidationError] = useState<ValidationErrorType>({});
 
     const editUserMutation = useMutation(EditUser,
         {
@@ -68,6 +76,23 @@ export function UserEditForm(userRoleProp: {value: UserRoles}){
         }
     )
 
+    const validateField = (key : keyof UserSchema, typedValue: UserSchema[keyof UserSchema]) =>{
+        const field = userSchema.shape[key].safeParse(typedValue);
+        if(field.success){
+            setValidationError(prev => {
+                const newErrors = {...prev};
+                delete newErrors[key];
+                return newErrors;
+            });
+        } else {
+            setValidationError(prev => ({
+                ...prev,
+                [key]: ErrorMessage({path: [String(field.error.issues[0].path[0])], message: field.error.issues[0].message})
+            }));
+        }
+    }
+
+
     if (!orgId) return <Alert severity="warning">Missing organization id</Alert>
     if(isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
     if(isError) return <Alert severity="error">{error instanceof Error ? error.message : 'An error occurred'}</Alert>;
@@ -76,16 +101,17 @@ export function UserEditForm(userRoleProp: {value: UserRoles}){
 
 
     const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const key = e.target.name as keyof UserSchema;
-    const value = e.target.value;
+        const key = e.target.name as keyof UserSchema;
+        const value = e.target.value;
 
-    setUser(prev => {
-        if (!prev) return prev;
-        return {
-        ...prev,
-        [key]: value,
-        };
-    });
+        setUser(prev => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                [key]: value,
+            };
+        });
+        validateField(key, value);
     };
 
     const handleSubmit =async (e: React.FormEvent<HTMLFormElement>) =>{
@@ -112,28 +138,28 @@ export function UserEditForm(userRoleProp: {value: UserRoles}){
                 UserRole: userRoleProp.value,
                 OrgId: orgId,
             })
-            setErrorMessage(null);
+            setValidationError({});
         } else {
-            if (result.error.issues[0].path[0] === "Name"){
-                setErrorMessage(result.error.issues[0].message);
-            }
-            else{
-            setErrorMessage(result.error.issues[0].path + " : " + result.error.issues[0].message);
-            }
-            console.error(result.error.issues);
+            setValidationError(prev => ({
+                ...prev,
+                [String(result.error.issues[0].path[0])]: ErrorMessage({path: [String(result.error.issues[0].path[0])], message: result.error.issues[0].message})
+            }));
+
         }
     }
 
     const renderField = (field: FieldConfig) =>(
         <TextField
             key={field.key}
-            type={"text"}
+            type={field.type}
             name={field.key}
             label={field.label}
             value={((user[field.key])??"")as string}
             onChange={handleChangeInput}
             fullWidth
             disabled={field.key === "UserRole"}
+            error={Boolean(validationError[field.key])}
+            helperText={validationError[field.key]}
         />
     )
 
@@ -155,12 +181,6 @@ export function UserEditForm(userRoleProp: {value: UserRoles}){
                         {editUserMutation.error instanceof Error
                             ? editUserMutation.error.message
                             : "An error occurred"}
-                    </Alert>
-                )}
-
-                {errorMessage && (
-                    <Alert severity="error">
-                        {errorMessage}
                     </Alert>
                 )}
 

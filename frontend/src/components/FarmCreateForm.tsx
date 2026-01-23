@@ -14,7 +14,7 @@ import type { FarmSchema } from "../schemas/farmSchemas";
 import { farmSchema } from "../schemas/farmSchemas";
 import { MapComponent } from "../components/MapComponent";
 import Box from "@mui/material/Box";
-
+import { ErrorMessage } from "./ErrorMessage";
 
 export function FarmCreateForm(){
     type FieldType = "text" | "number" | "checkbox";
@@ -24,6 +24,8 @@ export function FarmCreateForm(){
         label:string;
         type:FieldType
     }
+
+    type ValidationErrorType = Partial<Record<keyof FarmSchema, string>>;
 
     const fields : FieldConfig[] = [
         {key:"Name", label:"Farm Name", type:"text"},
@@ -37,7 +39,7 @@ export function FarmCreateForm(){
         Name: "",
         Longitude: 0,
         Latitude: 0,
-        NoOfCages: 0,
+        NoOfCages: 1,
         HasBarge: false,
     })
 
@@ -47,25 +49,42 @@ export function FarmCreateForm(){
 
     const queryClient = useQueryClient()
     const navigate = useNavigate();
-    const[errorMessage, setErrorMessage] = useState<string | null>(null);
-
+    const[validationError, setValidationError] = useState<ValidationErrorType>({});
     const createFarmMutation = useMutation(CreateFarm, {
         onSuccess: () => {
             queryClient.invalidateQueries("farms")
         },
     })
 
+    const validateField = (key : keyof FarmSchema, typedValue: FarmSchema[keyof FarmSchema]) =>{
+        const field = farmSchema.shape[key].safeParse(typedValue);
+        if(field.success){
+            setValidationError(prev => {
+                const newErrors = {...prev};
+                delete newErrors[key];
+                return newErrors;
+            });
+        } else {
+            setValidationError(prev => ({
+                ...prev,
+                [key]: ErrorMessage({path: [String(field.error.issues[0].path[0])], message: field.error.issues[0].message})
+            }));
+        }
+    }
+
     const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) =>{
         const {name,type,value,checked} = e.target;
         const key = name as keyof FarmSchema;
-        setFarm(prev =>({
-            ...prev,
-            [key]: type === "checkbox"? checked 
-                 : type === "number" ? key === "NoOfCages"? parseInt(value) || 0 
+        const typedValue = type === "checkbox"? checked 
+                 : type === "number" ? key === "NoOfCages"? parseInt(value) || 1 
                                      : key === "Longitude" || key === "Latitude" ? round4(Number(value))          
                                      : Number(value) 
-                 : value
+                 : value;
+        setFarm(prev =>({
+            ...prev,
+            [key]:typedValue as FarmSchema[typeof key]
         }))
+        validateField(key,typedValue);
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) =>{
@@ -77,20 +96,18 @@ export function FarmCreateForm(){
                 Name: "",
                 Longitude: 0,
                 Latitude: 0,
-                NoOfCages: 0,
+                NoOfCages: 1,
                 HasBarge: false,
             })
-            setErrorMessage(null);
+            setValidationError({});
             navigate("/farms");
         } else {
-            if (result.error.issues[0].path[0] === "Name"){
-                setErrorMessage(result.error.issues[0].message);
-            }
-            else{
-            setErrorMessage(result.error.issues[0].path + " : " + result.error.issues[0].message);
-            }
-            console.error(result.error.issues);
+            setValidationError(prev => ({
+                ...prev,
+                [String(result.error.issues[0].path[0])]: ErrorMessage({path: [String(result.error.issues[0].path[0])], message: result.error.issues[0].message})
+            }));
         }
+
     }
 
     const renderField = (field: FieldConfig) => {
@@ -120,9 +137,12 @@ export function FarmCreateForm(){
                 onChange={handleChangeInput}
                 inputProps={{
                     step: field.key === "Longitude" || field.key === "Latitude" ? "0.0001" : 
-                          field.key === "NoOfCages" ? "1" : undefined
+                          field.key === "NoOfCages" ? '1' : undefined
                 }}
                 fullWidth
+                error={Boolean(validationError[field.key])}
+                helperText={validationError[field.key]}
+
             />
             
         );
@@ -142,12 +162,6 @@ export function FarmCreateForm(){
                         {createFarmMutation.error instanceof Error
                             ? createFarmMutation.error.message
                             : "An error occurred"}
-                    </Alert>
-                )}
-
-                {errorMessage && (
-                    <Alert severity="error">
-                        {errorMessage}
                     </Alert>
                 )}
 

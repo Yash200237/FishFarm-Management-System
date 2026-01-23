@@ -56,6 +56,14 @@ namespace App.Infrastructure.Repositories
                     .ToListAsync();
         }
 
+        public async Task<IEnumerable<Farm>> GetFarmsUnassignedToWorker(Guid orgId, Guid workerId)
+        {
+            return await _context.Farms
+                    .Where(f => f.OrgId == orgId)
+                    .Where(f => !f.FarmWorkers.Any(fw => fw.WorkerId == workerId))
+                    .ToListAsync();
+        }
+
         public async Task<FarmWorker?> GetByIdAsync(Guid farmId, Guid workerId)
         {
             return await _context.FarmWorkers.FirstOrDefaultAsync(fw => fw.FarmId == farmId && fw.WorkerId == workerId);

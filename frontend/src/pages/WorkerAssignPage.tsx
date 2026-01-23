@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchFarms } from "../apis/farmsApis";
+import { fetchFarmsNotAssigned } from "../apis/farmsApis";
 import type { FarmResponse } from "../types/farm";
 import { useState } from "react";
 import { assignWorkerToFarm } from "../apis/wokersApis";
@@ -30,10 +30,9 @@ export const WorkerAssignPage = () => {
     const createAssignmentMutation = useMutation(assignWorkerToFarm, {
         onSuccess: () => {
             navigate(`/workers/${workerId}`)
-
         },
     })  
-    const {isLoading,isError,data:farms,error} = useQuery('farms',fetchFarms);
+    const {isLoading,isError,data:farms,error} = useQuery(['UnassignedFarms', workerId], () => fetchFarmsNotAssigned(workerId!));
     if (!workerId) return <Alert severity="warning">Missing worker id</Alert>
     if(isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
     if(isError) return <Alert severity="error">{error instanceof Error ? error.message : 'An error occurred'}</Alert>;      
@@ -115,7 +114,7 @@ export const WorkerAssignPage = () => {
                         >
                             {createAssignmentMutation.isLoading ? 'Assigning...' : 'Assign to Farm'}
                         </Button>
-                        <Button type="button" variant="outlined" fullWidth sx={{ mt: 2 }} onClick={() => navigate('/workers')}>
+                        <Button type="button" variant="outlined" fullWidth sx={{ mt: 2 }} onClick={() => navigate(-1)}>
                             Skip for later
                         </Button>
                 </ButtonGroup>

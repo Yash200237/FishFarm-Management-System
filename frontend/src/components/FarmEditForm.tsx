@@ -18,6 +18,7 @@ import type { FarmSchema } from "../schemas/farmSchemas";
 import { farmSchema } from "../schemas/farmSchemas";
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import { ButtonGroup } from "@mui/material";
+import { ErrorMessage } from "./ErrorMessage";
 
 
 export function FarmEditForm(){
@@ -28,6 +29,7 @@ export function FarmEditForm(){
         label:string;
         type:FieldType
     }
+    type ValidationErrorType = Partial<Record<keyof FarmSchema, string>>;
 
     const fields : FieldConfig[] = [
         {key:"Name", label:"Farm Name", type:"text"},
@@ -48,7 +50,7 @@ export function FarmEditForm(){
 
     const navigate = useNavigate();
 
-    const[errorMessage, setErrorMessage] = useState<string | null>(null);
+    const[validationError, setValidationError] = useState<ValidationErrorType>({});
 
     
     const [farm, setFarm] = useState<FarmSchema>(() => {
@@ -80,6 +82,22 @@ export function FarmEditForm(){
             navigate(`/farms/${farmId}`)
         },
     })
+
+    const validateField = (key : keyof FarmSchema, typedValue: FarmSchema[keyof FarmSchema]) =>{
+        const field = farmSchema.shape[key].safeParse(typedValue);
+        if(field.success){
+            setValidationError(prev => {
+                const newErrors = {...prev};
+                delete newErrors[key];
+                return newErrors;
+            });
+        } else {
+            setValidationError(prev => ({
+                ...prev,
+                [key]: ErrorMessage({path: [String(field.error.issues[0].path[0])], message: field.error.issues[0].message})
+            }));
+        }
+    }
     
     if (!farmId) return <Alert severity="warning">Missing farm id</Alert>
     if(isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
@@ -102,14 +120,16 @@ export function FarmEditForm(){
     const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) =>{
         const {name,type,value,checked} = e.target;
         const key = name as keyof FarmSchema;
-        setFarm(prev =>({
-            ...prev,
-            [key]: type === "checkbox"? checked 
-                 : type === "number" ? key === "NoOfCages"? parseInt(value) || 0 
+                const typedValue = type === "checkbox"? checked 
+                 : type === "number" ? key === "NoOfCages"? parseInt(value) || 1 
                                      : key === "Longitude" || key === "Latitude" ? round4(Number(value))          
                                      : Number(value) 
-                 : value
+                 : value;
+        setFarm(prev =>({
+            ...prev,
+            [key]:typedValue as FarmSchema[typeof key]
         }))
+        validateField(key,typedValue);
     }
 
     const handleSubmit =async (e: React.FormEvent<HTMLFormElement>) =>{
@@ -122,14 +142,10 @@ export function FarmEditForm(){
         })
         }
         else {
-            if (result.error.issues[0].path[0] === "Name"){
-                setErrorMessage(result.error.issues[0].message);
-            }
-            else{
-            setErrorMessage(result.error.issues[0].path + " : " + result.error.issues[0].message);
-            }
-            console.error(result.error.issues);
-        }
+            setValidationError(prev => ({
+                ...prev,
+                [String(result.error.issues[0].path[0])]: ErrorMessage({path: [String(result.error.issues[0].path[0])], message: result.error.issues[0].message})
+            }));        }
     }
 
     const renderField = (field: FieldConfig) => {
@@ -184,6 +200,8 @@ export function FarmEditForm(){
                 }}
                 fullWidth
                 sx={{ mb: 2 }}
+                error={Boolean(validationError[field.key])}
+                helperText={validationError[field.key]}
             />
         );
     }
@@ -195,12 +213,9 @@ export function FarmEditForm(){
                     <Typography variant="h4" component="h2" gutterBottom>
                         Edit Farm
                     </Typography>
+
                     {fields.map(renderField)}
-                    {errorMessage && (
-                        <Alert severity="error">
-                            {errorMessage}
-                        </Alert>
-                    )}
+                    
                     <ButtonGroup fullWidth>
                         <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
                             Save Changes

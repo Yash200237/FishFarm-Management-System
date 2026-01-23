@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     })();
   }, []);
 
-  const meQuery = useQuery<User, Error>(["me",token], () => GetCurrentUser(),{
+  const meQuery = useQuery<User, Error>(["me"], () => GetCurrentUser(),{
     enabled: !!token,
     refetchOnMount: "always",
     retry: false,

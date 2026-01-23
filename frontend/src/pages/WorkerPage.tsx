@@ -114,9 +114,18 @@ export const WorkerPage = () => {
 
           <Divider sx={{ my: 3 }} />
 
-          <Typography variant="h5" gutterBottom>
-            Assigned Farms
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h5" gutterBottom>
+              Assigned Farms
+            </Typography>
+            <Button 
+                size="small" 
+                variant="contained"
+                onClick={() => navigate(`/workers/${worker.workerId}/assign`)}
+              >
+                Assign to Farms
+            </Button>
+          </Box>
 
           {farms.length === 0 ? (
             <Alert severity="info">Not assigned to any farm</Alert>

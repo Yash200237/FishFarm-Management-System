@@ -15,6 +15,7 @@ import Paper from '@mui/material/Paper'
 import { workerSchema } from "../schemas/workerSchemas";
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import ButtonGroup from "@mui/material/ButtonGroup";
+import { ErrorMessage } from "./ErrorMessage";
 
 export function WorkerEditForm(){
     type FieldType = "text" | "number" | "checkbox" | "file";
@@ -24,6 +25,7 @@ export function WorkerEditForm(){
         label:string;
         type:FieldType
     }
+    type ValidationErrorType = Partial<Record<keyof WorkerSchema, string>>;
 
     const fields : FieldConfig[] = [
         {key:"Name", label:"Farm Name", type:"text"},
@@ -37,8 +39,23 @@ export function WorkerEditForm(){
     const {isLoading,isError,data,error} = useQuery(['workers',workerId],() => fetchWorkerById(workerId!),{ enabled: !!workerId });
 
     const navigate = useNavigate();
-    const[errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [validationError, setValidationError] = useState<ValidationErrorType>({});
 
+    const validateField = (key : keyof WorkerSchema, typedValue: WorkerSchema[keyof WorkerSchema]) =>{
+        const field = workerSchema.shape[key].safeParse(typedValue);
+        if(field.success){
+            setValidationError(prev => {
+                const newErrors = {...prev};
+                delete newErrors[key];
+                return newErrors;
+            });
+        } else {
+            setValidationError(prev => ({
+                ...prev,
+                [key]: ErrorMessage({path: [String(field.error.issues[0].path[0])], message: field.error.issues[0].message})
+            }));
+        }
+    }
     
     const [worker, setWorker] = useState<WorkerSchema>(() => {
         if (data) {
@@ -73,11 +90,13 @@ export function WorkerEditForm(){
     const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) =>{
         const {name,type,value} = e.target;
         const key = name as keyof WorkerSchema;
+        const typedValue =type === "number" ? parseInt(value) || 0 
+                 : value;
         setWorker(prev =>({
             ...prev,
-            [key]: type === "number" ? parseInt(value) || 0 
-                 : value
+            [key]: typedValue
         }))
+        validateField(key, typedValue);
     }
 
     const handleSubmit =async (e: React.FormEvent<HTMLFormElement>) =>{
@@ -88,15 +107,12 @@ export function WorkerEditForm(){
             workerId: workerId!,
             worker: worker,
         })
-        }
-        else {
-            if (result.error.issues[0].path[0] === "Name"){
-                setErrorMessage(result.error.issues[0].message);
-            }
-            else{
-            setErrorMessage(result.error.issues[0].path + " : " + result.error.issues[0].message);
-            }
-            console.error(result.error.issues);
+        setValidationError({});
+        } else {
+            setValidationError(prev => ({
+                ...prev,
+                [String(result.error.issues[0].path[0])]: ErrorMessage({path: [String(result.error.issues[0].path[0])], message: result.error.issues[0].message})
+            }));
         }
     }
 
@@ -150,6 +166,8 @@ export function WorkerEditForm(){
                 }}
                 fullWidth
                 sx={{ mb: 2 }}
+                error={Boolean(validationError[field.key])}
+                helperText={validationError[field.key]}
             />
         );
     }
@@ -162,11 +180,6 @@ export function WorkerEditForm(){
                         Edit Worker
                     </Typography>
                     {fields.map(renderField)}
-                    {errorMessage && (
-                        <Alert severity="error">
-                            {errorMessage}
-                        </Alert>
-                    )}
                     <ButtonGroup fullWidth>
                         <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
                             Save Changes

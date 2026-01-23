@@ -66,7 +66,6 @@ namespace FishFarmApp.Controllers
                 });
             }
             return Ok(result.Dto);
-
         }
 
         [HttpPost("Logout")]

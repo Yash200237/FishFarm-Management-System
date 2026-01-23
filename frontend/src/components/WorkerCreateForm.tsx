@@ -10,6 +10,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import { StyledPaper, StyledForm } from '../styles/Common.styles'
 import type { WorkerSchema } from "../schemas/workerSchemas";
 import { workerSchema } from "../schemas/workerSchemas";
+import { ErrorMessage } from "./ErrorMessage";
 
 export function WorkerCreateForm(){
     type FieldType = "text" | "number" | "checkbox";
@@ -19,6 +20,7 @@ export function WorkerCreateForm(){
         label:string;
         type:FieldType
     }
+    type ValidationErrorType = Partial<Record<keyof WorkerSchema, string>>;
 
     const fields : FieldConfig[] = [
         {key:"Name", label:"Worker Name", type:"text"},
@@ -36,7 +38,8 @@ export function WorkerCreateForm(){
 
     const queryClient = useQueryClient()
     const navigate = useNavigate();
-    const[errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [validationError, setValidationError] = useState<ValidationErrorType>({});
+    
 
     const createWorkerMutation = useMutation(CreateWorker, {
         onSuccess: (createdWorker) => {
@@ -45,16 +48,35 @@ export function WorkerCreateForm(){
 
         },
     })
+    const validateField = (key : keyof WorkerSchema, typedValue: WorkerSchema[keyof WorkerSchema]) =>{
+        const field = workerSchema.shape[key].safeParse(typedValue);
+        if(field.success){
+            setValidationError(prev => {
+                const newErrors = {...prev};
+                delete newErrors[key];
+                return newErrors;
+            });
+        } else {
+            setValidationError(prev => ({
+                ...prev,
+                [key]: ErrorMessage({path: [String(field.error.issues[0].path[0])], message: field.error.issues[0].message})
+            }));
+        }
+    }
 
     const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) =>{
         const {name,type,value} = e.target;
         const key = name as keyof WorkerSchema;
+        const typedValue =type === "number" ? parseInt(value) || 0 
+                 : value;
         setWorker(prev =>({
             ...prev,
-            [key]: type === "number" ? parseInt(value) || 0 
-                 : value
+            [key]: typedValue
         }))
+        validateField(key, typedValue);
+
     }
+
 
     const handleSubmit =async (e: React.FormEvent<HTMLFormElement>) =>{
         e.preventDefault();
@@ -67,15 +89,12 @@ export function WorkerCreateForm(){
                 Email: "",
                 Phone: "",
             })
-            setErrorMessage(null);
+            setValidationError({});
         } else {
-            if (result.error.issues[0].path[0] === "Name"){
-                setErrorMessage(result.error.issues[0].message);
-            }
-            else{
-            setErrorMessage(result.error.issues[0].path + " : " + result.error.issues[0].message);
-            }
-            console.error(result.error.issues);
+            setValidationError(prev => ({
+                ...prev,
+                [String(result.error.issues[0].path[0])]: ErrorMessage({path: [String(result.error.issues[0].path[0])], message: result.error.issues[0].message})
+            }));
         }
     }
 
@@ -91,6 +110,8 @@ export function WorkerCreateForm(){
                 step: field.key === "Age" ? "1" : undefined
             }}
             fullWidth
+            error={Boolean(validationError[field.key])}
+            helperText={validationError[field.key]}
         />
     )
 
@@ -111,11 +132,6 @@ export function WorkerCreateForm(){
                     </Alert>
                 )}
 
-                {errorMessage && (
-                    <Alert severity="error">
-                        {errorMessage}
-                    </Alert>
-                )}
 
                 {fields.map(renderField)}
                 

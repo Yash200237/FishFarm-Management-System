@@ -11,21 +11,28 @@ import { StyledPaper, StyledForm } from '../styles/Common.styles'
 import type { UserSchema } from "../schemas/userSchemas";
 import type { UserRoles } from "../types/user";
 import { userSchema } from "../schemas/userSchemas";
+import { ErrorMessage } from "./ErrorMessage";
 
 
 export function UserCreateForm(userRoleProp: {value: UserRoles}){
+    type FieldType = "text" | "email" | "password";
     type FieldConfig = {
             key: keyof UserSchema;
             label:string;
-    }
+            type:FieldType;
+    };
+
     const fields : FieldConfig[] = [
-        {key:"Name", label:"Full Name"},
-        {key:"Email", label:"Email"},
-        {key:"UserName", label:"Username"},
-        {key:"Password", label:"Password"},
-        {key:"ConfirmPassword", label:"Confirm Password"},
-        {key:"UserRole", label:"User Role"},
+        {key:"Name", label:"Full Name",type:"text"},
+        {key:"Email", label:"Email",type:"email"},
+        {key:"UserName", label:"Username",type:"text"},
+        {key:"Password", label:"Password",type:"password"},
+        {key:"ConfirmPassword", label:"Confirm Password",type:"password"},
+        {key:"UserRole", label:"User Role",type:"text"},
     ]
+
+    type ValidationErrorType = Partial<Record<keyof UserSchema, string>>;
+
     const {orgId} = useParams<{orgId: string}>();
 
     const [User, setUser] = useState<UserSchema>({
@@ -40,7 +47,7 @@ export function UserCreateForm(userRoleProp: {value: UserRoles}){
 
     const queryClient = useQueryClient()
     const navigate = useNavigate();
-    const[errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [validationError, setValidationError] = useState<ValidationErrorType>({});
 
     const createUserMutation = useMutation(
         userRoleProp.value === 'OrgAdmin' ? CreateAdminUser : CreateUser,
@@ -56,6 +63,22 @@ export function UserCreateForm(userRoleProp: {value: UserRoles}){
         }
     )
 
+    const validateField = (key : keyof UserSchema, typedValue: UserSchema[keyof UserSchema]) =>{
+        const field = userSchema.shape[key].safeParse(typedValue);
+        if(field.success){
+            setValidationError(prev => {
+                const newErrors = {...prev};
+                delete newErrors[key];
+                return newErrors;
+            });
+        } else {
+            setValidationError(prev => ({
+                ...prev,
+                [key]: ErrorMessage({path: [String(field.error.issues[0].path[0])], message: field.error.issues[0].message})
+            }));
+        }
+    }
+
     if (!orgId) return <Alert severity="warning">Missing organization id</Alert>
 
     const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) =>{
@@ -64,6 +87,7 @@ export function UserCreateForm(userRoleProp: {value: UserRoles}){
             ...prev,
             [key] : e.target.value
         }))
+        validateField(key,e.target.value);
     }
 
     const handleSubmit =async (e: React.FormEvent<HTMLFormElement>) =>{
@@ -80,28 +104,28 @@ export function UserCreateForm(userRoleProp: {value: UserRoles}){
                 UserRole: userRoleProp.value,
                 OrgId: orgId,
             })
-            setErrorMessage(null);
+            setValidationError({});
         } else {
-            if (result.error.issues[0].path[0] === "Name"){
-                setErrorMessage(result.error.issues[0].message);
-            }
-            else{
-            setErrorMessage(result.error.issues[0].path + " : " + result.error.issues[0].message);
-            }
-            console.error(result.error.issues);
+            setValidationError(prev => ({
+                ...prev,
+                [String(result.error.issues[0].path[0])]: ErrorMessage({path: [String(result.error.issues[0].path[0])], message: result.error.issues[0].message})
+            }));
+
         }
     }
 
     const renderField = (field: FieldConfig) =>(
         <TextField
             key={field.key}
-            type={"text"}
+            type={field.type}
             name={field.key}
             label={field.label}
             value={String(User[field.key])}
             onChange={handleChangeInput}
             fullWidth
             disabled={field.key === "UserRole"}
+            error={Boolean(validationError[field.key])}
+            helperText={validationError[field.key]}
         />
     )
 
@@ -123,12 +147,6 @@ export function UserCreateForm(userRoleProp: {value: UserRoles}){
                         {createUserMutation.error instanceof Error
                             ? createUserMutation.error.message
                             : "An error occurred"}
-                    </Alert>
-                )}
-
-                {errorMessage && (
-                    <Alert severity="error">
-                        {errorMessage}
                     </Alert>
                 )}
 

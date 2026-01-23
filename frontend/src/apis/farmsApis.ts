@@ -7,6 +7,10 @@ export async function fetchFarms(): Promise<FarmResponse[]> {
     const response  = await api.get<FarmResponse[]>("/Farm")
     return response.data;
 }
+export async function fetchFarmsNotAssigned(workerId: string): Promise<FarmResponse[]> {
+    const response = await api.get<FarmResponse[]>(`/FarmWorker/farm/unassigned/${workerId}`);
+    return response.data;
+}
 
 export async function fetchFarmById(id:string): Promise<FarmResponse> {
     const response = await api.get<FarmResponse>(`/Farm/${id}`)

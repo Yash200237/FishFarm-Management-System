@@ -16,6 +16,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 import { fetchOrgById } from "../apis/orgsApis";
 import ButtonGroup from "@mui/material/ButtonGroup";
+import { ErrorMessage } from "./ErrorMessage";
 
 
 export function OrgsEditForm(){
@@ -24,6 +25,9 @@ export function OrgsEditForm(){
             label:string;
             type: string;
     }
+
+    type ValidationErrorType = Partial<Record<keyof OrgSchema, string>>;
+    
     const fields : FieldConfig[] = [
         {key:"Name", label:"Organization Name",type:"text"},
         {key:"Description", label:"Description",type:"text"},
@@ -36,7 +40,7 @@ export function OrgsEditForm(){
     
     const {isLoading,isError,data:orgData,error} = useQuery(['orgs',orgId],() => fetchOrgById(orgId!),{ enabled: !!orgId });
     
-    const[errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [validationError, setValidationError] = useState<ValidationErrorType>({});
 
         
     const [org, setOrg] = useState<OrgSchema>(() => {
@@ -61,6 +65,22 @@ export function OrgsEditForm(){
         },
     })
     
+    const validateField = (key : keyof OrgSchema, value: OrgSchema[keyof OrgSchema]) =>{
+        const field = orgSchema.shape[key].safeParse(value);
+        if(field.success){
+            setValidationError(prev => {
+                const newErrors = {...prev};
+                delete newErrors[key];
+                return newErrors;
+            });
+        } else {
+            setValidationError(prev => ({
+                ...prev,
+                [key]: ErrorMessage({path: [String(field.error.issues[0].path[0])], message: field.error.issues[0].message})
+            }));
+        }
+    }
+
     if (!orgId) return <Alert severity="warning">Missing org id</Alert>
     if(isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
     if(isError) return <Alert severity="error">{error instanceof Error ? error.message : 'An error occurred'}</Alert>;
@@ -73,6 +93,9 @@ export function OrgsEditForm(){
             ...prev,
             [key]: value
         }))
+
+        validateField(key,value);
+
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) =>{
@@ -90,16 +113,13 @@ export function OrgsEditForm(){
                 Description:"",
                 Logo: "",
             })
-            setErrorMessage(null);
+            setValidationError({});
             navigate("/orgs");
         } else {
-            if (result.error.issues[0].path[0] === "Name"){
-                setErrorMessage(result.error.issues[0].message);
-            }
-            else{
-            setErrorMessage(result.error.issues[0].path + " : " + result.error.issues[0].message);                                                                                                                       
-            }
-            console.error(result.error.issues);
+            setValidationError(prev => ({
+                ...prev,
+                [String(result.error.issues[0].path[0])]: ErrorMessage({path: [String(result.error.issues[0].path[0])], message: result.error.issues[0].message})
+            }));
         }
     }
 
@@ -135,11 +155,6 @@ export function OrgsEditForm(){
                     </Alert>
                 )}
 
-                {errorMessage && (
-                    <Alert severity="error">
-                        {errorMessage}
-                    </Alert>
-                )}
 
                 {fields.map(field => {
                         if (field.type === "file") {
@@ -169,6 +184,8 @@ export function OrgsEditForm(){
                         value={String(org[field.key])}
                         onChange={handleChangeInput}
                     fullWidth
+                    error={Boolean(validationError[field.key])}
+                    helperText={validationError[field.key]}
                     />
                     }
                 })          

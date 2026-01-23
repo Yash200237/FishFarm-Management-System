@@ -7,7 +7,7 @@ export const farmSchema = z.object({
         Name: z.string().min(1, "Farm Name is required"),
         Longitude: z.number().min(-180).max(180),
         Latitude: z.number().min(-90).max(90),
-        NoOfCages: z.number().min(1),
+        NoOfCages: z.number().min(1," Number of Cages must be at least 1"),
         HasBarge: z.boolean(),
         Picture: z.string().nullable().optional(),
         Phone: z.preprocess(
