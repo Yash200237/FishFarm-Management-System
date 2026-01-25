@@ -15,11 +15,13 @@ import { assignSchema, type AssignSchema } from "../schemas/workerSchemas";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import type { WorkerResponse } from "../types/worker";
 import { StyledEditBox } from "../styles/Common.styles";
+import { ErrorMessage } from "../components/ErrorMessage";
 
 export const FarmWorkerAssignPage = () => {
+    type ValidationErrorType = Partial<Record<keyof AssignSchema, string>>;
     const {farmId} = useParams<{farmId: string}>();
     const navigate = useNavigate();
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<ValidationErrorType>({});
     const [assignWorker, setAssignWorker] = useState<AssignSchema>({
         WorkerId: "",
         FarmId: farmId || "",
@@ -32,18 +34,55 @@ export const FarmWorkerAssignPage = () => {
 
         },
     })  
-    const {isLoading,isError,data:workers,error} = useQuery('workers', () => fetchWorkersNotAssigned(farmId!));
+
+    const validateField = (key: keyof AssignSchema, value: AssignSchema[keyof AssignSchema]) => {
+    const result = assignSchema.shape[key].safeParse(value);
+
+    if (result.success) {
+      setValidationError((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+    } else {
+        setValidationError((prev) => ({
+            ...prev,
+            [key]: ErrorMessage({ path: [String(key)], message: result.error.issues[0].message }),
+        }));
+        }
+    };
+
+    const {isLoading,isError,data:workers,error} = useQuery(["workers_not_assigned", farmId], () => fetchWorkersNotAssigned(farmId!),{ enabled: !!farmId });
     if (!farmId) return <Alert severity="warning">Missing farm id</Alert>
     if(isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
-    if(isError) return <Alert severity="error">{error instanceof Error ? error.message : 'An error occurred'}</Alert>;      
+    if(isError) return <Alert severity="error">{error instanceof Error ? error.message : 'An error occurred'}</Alert>; 
+        
+    const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) =>{
+        const {name,value} = e.target;
+        const key = name as keyof AssignSchema;
+        setAssignWorker(prev =>({
+            ...prev,
+            [key]: value
+        }))
+
+        validateField(key,value as AssignSchema[keyof AssignSchema]);
+    }
 
     const handleOnClick = () => {
         const result = assignSchema.safeParse(assignWorker);
         if(result.success){
+            setValidationError({});
             createAssignmentMutation.mutate(assignWorker)}
         else {
-            setErrorMessage(result.error.issues[0].path + " : " + result.error.issues[0].message);
-        }
+            const errors: ValidationErrorType = {};
+            for (const issue of result.error.issues) {
+            const key = issue.path[0] as keyof AssignSchema;
+            errors[key] = ErrorMessage({
+                path: [String(key)],
+                message: issue.message,
+            });
+            }
+            setValidationError(errors);        }
     }
 
   return (
@@ -55,19 +94,14 @@ export const FarmWorkerAssignPage = () => {
 
             <StyledEditBox>
 
-                {errorMessage && (
-                    <Alert severity="error">
-                        {errorMessage}
-                    </Alert>
-                )}
-
                 <TextField
                     select
+                    name="Role"
                     label="Role"
                     value={assignWorker.Role}
-                    onChange={(e) =>
-                        setAssignWorker((prev) => ({ ...prev, Role: e.target.value as AssignSchema["Role"] }))
-                    }
+                    error={Boolean(validationError.Role)}
+                    helperText={validationError.Role}
+                    onChange={handleChangeInput}
                     fullWidth
                 >
                     <MenuItem value="CEO">CEO</MenuItem>
@@ -77,15 +111,16 @@ export const FarmWorkerAssignPage = () => {
 
                 <TextField
                     select
+                    name="WorkerId"
                     label="Select Worker"
                     value={assignWorker.WorkerId}
-                    onChange={(e) =>
-                        setAssignWorker((prev) => ({ ...prev, WorkerId: e.target.value }))
-                    }
+                    onChange={handleChangeInput}
+                    error={Boolean(validationError.WorkerId)}
+                    helperText={validationError.WorkerId}
                     fullWidth
                     required
                 >
-                    <MenuItem value="">-- Select a worker --</MenuItem>
+                    <MenuItem value="" disabled>-- Select a worker --</MenuItem>
                     {workers?.map((worker: WorkerResponse) => (
                         <MenuItem key={worker.workerId} value={worker.workerId}>{worker.name}</MenuItem>
                     ))}
@@ -93,18 +128,19 @@ export const FarmWorkerAssignPage = () => {
 
                 <TextField
                     type="date"
+                    name="CertifiedUntil"
                     label="Certified Until"
                     value={assignWorker.CertifiedUntil}
-                    onChange={(e) =>
-                        setAssignWorker((prev) => ({ ...prev, CertifiedUntil: e.target.value}))
-                    }
+                    onChange={handleChangeInput}
+                    error={Boolean(validationError.CertifiedUntil)}
+                    helperText={validationError.CertifiedUntil}
                     InputLabelProps={{ shrink: true }}
                     fullWidth
                 />
                 <ButtonGroup fullWidth>
                         <Button 
                             variant="contained"
-                            disabled={!assignWorker.FarmId || createAssignmentMutation.isLoading}
+                            disabled={!assignWorker.WorkerId  || createAssignmentMutation.isLoading}
                             onClick={() => {
                                 handleOnClick();
                             }

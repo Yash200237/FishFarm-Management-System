@@ -70,6 +70,9 @@ export const FarmPage = () => {
     if(isError || isWorkersError) return <Alert severity="error">{error instanceof Error ? error.message : 'An error occurred'}</Alert>;
     if(!farm || !workers) return <Alert severity="info">No data available</Alert>;
 
+    const today = new Date();
+    const todayYmd = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
     return (
       <PageContainer>
         {open && DeleteAlertDialog(
@@ -158,10 +161,12 @@ export const FarmPage = () => {
 
           
           {workers.length === 0 ? (
-            <Alert severity="info">No workers assigned to this farm</Alert>
+            <Alert severity="info" sx={{ mb: 2 }}>No workers assigned to this farm</Alert>
           ) : (
             <List>
-              {workers.map((worker:FarmWorkerDetails) => 
+              {workers.map((worker:FarmWorkerDetails) => {
+                const isExpired = !!worker.certifiedUntil && worker.certifiedUntil < todayYmd;
+                return (
                 <StyledListItem
                   key={worker.workerId}
                   secondaryAction={
@@ -169,7 +174,7 @@ export const FarmPage = () => {
                       <Button
                         size="small"
                         onClick={() => navigate(`/farms/${farm.farmId}/workers/${worker.workerId}/edit`)}>
-                        Edit
+                        {isExpired ? "Renew" : "Edit Role"}
                       </Button>
                       <Button 
                         size="small" 
@@ -197,20 +202,25 @@ export const FarmPage = () => {
                         </Typography>
                         <ChipContainer>
                           <Chip label={worker.role} size="small" color="primary" />
-                          <Chip 
-                            label={`Until: ${worker.certifiedUntil ?? "N/A"}`}
-                            size="small" 
-                          />
+                          <Chip
+                              label={`Until: ${worker.certifiedUntil ?? "N/A"}`}
+                              size="small"
+                              variant="outlined"
+                              sx={{
+                                color: isExpired ? "error.main" : "text.primary",
+                                borderColor: isExpired ? "error.main" : "divider",
+                              }}
+                            />
+                          {isExpired && <Chip label="Expired" size="small" color="error" />}
                         </ChipContainer>
                       </Box>
                     }
                   />
                 </StyledListItem>
-              )}
+              )
+              })}
             </List>
           )}
-
-          <Divider sx={{ my: 3 }} />
 
         <ProtectedWrapper allowedRoles={['OrgAdmin']}>
           <ButtonGroup variant="contained" fullWidth>

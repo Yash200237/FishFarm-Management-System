@@ -67,6 +67,8 @@ export const WorkerPage = () => {
       setDialogFarmId(farmId);
       setOpenWorker(true);
     }
+    const today = new Date();
+    const todayYmd = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
     return (
       <PageContainer>
@@ -131,7 +133,9 @@ export const WorkerPage = () => {
             <Alert severity="info">Not assigned to any farm</Alert>
           ) : (
             <List>
-              {farms.map((farm:FarmWDetailsDto) =>
+              {farms.map((farm:FarmWDetailsDto) =>{
+                const isExpired = !!farm.certifiedUntil && farm.certifiedUntil < todayYmd;
+                return(
                 <StyledListItem
                   key={farm.farmId}
                   secondaryAction={
@@ -139,7 +143,7 @@ export const WorkerPage = () => {
                       <Button
                         size="small"
                         onClick={() => navigate(`/farms/${farm.farmId}/workers/${worker.workerId}/edit`)}>
-                        Edit
+                        {isExpired ? "Renew" : "Edit Role"}
                       </Button>
                       <Button 
                         size="small" 
@@ -163,14 +167,22 @@ export const WorkerPage = () => {
                     secondary={
                       <ChipContainer>
                         <Chip label={farm.role} size="small" color="primary" />
-                        <Chip 
-                          label={`Until: ${farm.certifiedUntil ?? "N/A"}`}
-                          size="small" 
-                        />
+                        <Chip
+                              label={`Until: ${farm.certifiedUntil ?? "N/A"}`}
+                              size="small"
+                              variant="outlined"
+                              sx={{
+                                color: isExpired ? "error.main" : "text.primary",
+                                borderColor: isExpired ? "error.main" : "divider",
+                              }}
+                            />
+                        {isExpired && <Chip label="Expired" size="small" color="error" />}
                       </ChipContainer>
                     }
                   />
                 </StyledListItem>
+                )
+              }
               )}
             </List>
           )}

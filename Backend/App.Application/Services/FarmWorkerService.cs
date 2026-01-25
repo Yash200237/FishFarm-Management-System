@@ -44,6 +44,11 @@ namespace App.Application.Services
             var workers = await _farmWorkerRepository.GetWorkersUnassignedToFarm(orgId, farmId);
             return _mapper.Map<IEnumerable<WorkerResponseDto>>(workers);
         }
+        public async Task<IEnumerable<FarmWorkerDto>> GetExpiredFarmWorkers(Guid orgId)
+        {
+            var farmworkers = await _farmWorkerRepository.GetExpiredWorkers(orgId);
+            return _mapper.Map<IEnumerable<FarmWorkerDto>>(farmworkers);
+        }
 
         public async Task<IEnumerable<FarmResponseDto>> GetFarmsUnassignedForWorker(Guid orgId, Guid workerId)
         {

@@ -31,3 +31,13 @@ export interface FarmWDetailsDto{
         role: Roles;
         certifiedUntil: string | null;
 }
+
+export interface FarmWorkerDto{
+        farmId: string;
+        workerId: string;
+        farmName: string;
+        workerName: string;
+        workerEmail: string;
+        role: Roles;
+        certifiedUntil: string | null;
+}

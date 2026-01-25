@@ -48,6 +48,24 @@ namespace FishFarmApp.Controllers
         }
 
         [Authorize(Policy = "RequireOrgMember")]
+        [HttpGet("worker/expired")]
+        public async Task<ActionResult<IEnumerable<FarmWorkerDto>>> GetExpiredWorkers()
+        {
+
+            var orgClaimValue = User.FindFirst("OrgId")?.Value;
+            if (string.IsNullOrWhiteSpace(orgClaimValue))
+                return Forbid();
+
+            if (!Guid.TryParse(orgClaimValue, out var orgId))
+                return Forbid();
+
+            var expiredWorkers = await _farmWorkerService.GetExpiredFarmWorkers(orgId);
+            return Ok(expiredWorkers);
+
+        }
+
+
+        [Authorize(Policy = "RequireOrgMember")]
         [HttpGet("worker/unassigned/{farmId}")]
         public async Task<ActionResult<IEnumerable<WorkerResponseDto>>> GetUnassignedWorkersToFarm(Guid farmId)
         {

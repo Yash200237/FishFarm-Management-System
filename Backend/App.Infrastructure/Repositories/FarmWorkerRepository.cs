@@ -2,6 +2,7 @@
 using App.Domain.Interfaces;
 using App.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace App.Infrastructure.Repositories
 {
@@ -62,6 +63,16 @@ namespace App.Infrastructure.Repositories
                     .Where(f => f.OrgId == orgId)
                     .Where(f => !f.FarmWorkers.Any(fw => fw.WorkerId == workerId))
                     .ToListAsync();
+        }
+
+        public async Task<IEnumerable<FarmWorker>> GetExpiredWorkers(Guid orgId)
+        {
+            return await _context.FarmWorkers
+                .Where(fw => fw.Worker.OrgId == orgId)
+                .Where(fw => fw.CertifiedUntil < DateOnly.FromDateTime(DateTime.Now))
+                .Include(fw => fw.Farm)
+                .Include(fw => fw.Worker)
+                .ToListAsync();
         }
 
         public async Task<FarmWorker?> GetByIdAsync(Guid farmId, Guid workerId)

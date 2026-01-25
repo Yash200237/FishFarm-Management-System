@@ -1,5 +1,5 @@
 import type { AssignSchema, WorkerSchema } from "../schemas/workerSchemas";
-import type { AssignWorkerFormResponse, FarmWorkerDetails, WorkerResponse } from "../types/worker";
+import type { AssignWorkerFormResponse, FarmWorkerDetails, FarmWorkerDto, WorkerResponse } from "../types/worker";
 import { api } from "./apiClient";
 
 export async function fetchWorkers(): Promise<WorkerResponse[]> {
@@ -9,6 +9,11 @@ export async function fetchWorkers(): Promise<WorkerResponse[]> {
 
 export async function fetchWorkersNotAssigned(farmId: string): Promise<WorkerResponse[]> {
     const response = await api.get<WorkerResponse[]>(`/FarmWorker/worker/unassigned/${farmId}`);
+    return response.data;
+}
+
+export async function fetchExpiredWorkers(): Promise<FarmWorkerDto[]> {
+    const response = await api.get<FarmWorkerDto[]>(`/FarmWorker/worker/expired`);
     return response.data;
 }
 

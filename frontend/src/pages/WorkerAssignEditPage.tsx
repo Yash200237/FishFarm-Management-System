@@ -16,12 +16,15 @@ import { useQuery } from "react-query";
 import { fetchWorkerToFarm } from "../apis/wokersApis";
 import CircularProgress from "@mui/material/CircularProgress";
 import { StyledEditBox } from "../styles/Common.styles";
+import { ErrorMessage } from "../components/ErrorMessage";
 
 export const WorkerAssignEditPage = () => {
+    type ValidationErrorType = Partial<Record<keyof AssignSchema, string>>;
+
     const {workerId} = useParams<{workerId: string}>();
     const {farmId} = useParams<{farmId: string}>();
     const navigate = useNavigate();
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [validationError, setValidationError] = useState<ValidationErrorType>({});    
     const [assignWorker, setAssignWorker] = useState<AssignSchema | null>(null);
     const {isLoading,isError,data:assignWorkerData,error} = useQuery(['FarmWorker',workerId, farmId],() => fetchWorkerToFarm(workerId!, farmId!),{
             enabled: !!workerId && !!farmId ,
@@ -41,9 +44,25 @@ export const WorkerAssignEditPage = () => {
         onSuccess: () => {
             navigate(-1)
         },
-    })  
+    })
 
-if (!workerId || !farmId) return <Alert severity="warning">Missing worker id or farm id</Alert>
+    const validateField = (key : keyof AssignSchema, value: AssignSchema[keyof AssignSchema]) =>{
+        const field = assignSchema.shape[key].safeParse(value);
+        if(field.success){
+            setValidationError(prev => {
+                const newErrors = {...prev};
+                delete newErrors[key];
+                return newErrors;
+            });
+        } else {
+            setValidationError(prev => ({
+                ...prev,
+                [key]: ErrorMessage({path: [String(key)], message: field.error.issues[0].message})
+            }));
+        }
+    }
+
+    if (!workerId || !farmId) return <Alert severity="warning">Missing worker id or farm id</Alert>
     if(isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
     if(isError) return <Alert severity="error">{error instanceof Error ? error.message : 'An error occurred'}</Alert>;
     if(!assignWorkerData) return <Alert severity="info">No data available</Alert>;
@@ -52,9 +71,18 @@ if (!workerId || !farmId) return <Alert severity="warning">Missing worker id or 
     const handleOnClick = () => {
         const result = assignSchema.safeParse(assignWorker);
         if(result.success){
+            setValidationError({});
             updateAssignmentMutation.mutate(result.data)}
         else {
-            setErrorMessage(result.error.issues[0].path + " : " + result.error.issues[0].message);
+            const errors: ValidationErrorType = {};
+                        for (const issue of result.error.issues) {
+                            const key = issue.path[0] as keyof AssignSchema;
+                            errors[key] = ErrorMessage({
+                            path: [String(key)],
+                            message: issue.message,
+                            });
+                        }
+            setValidationError(errors); 
         }
     }
 
@@ -67,19 +95,21 @@ if (!workerId || !farmId) return <Alert severity="warning">Missing worker id or 
 
             <StyledEditBox>
 
-                {errorMessage && (
-                    <Alert severity="error">
-                        {errorMessage}
-                    </Alert>
-                )}
-
                 <TextField
                     select
+                    name = "Role"
                     label="Role"
                     value={assignWorker.Role}
-                    onChange={(e) =>
-                        setAssignWorker((prev) => prev ? { ...prev, Role: e.target.value as AssignSchema["Role"] } : null)
+                    onChange={
+                        (e) => {
+                            const value = e.target.value as AssignSchema["Role"];
+                            setAssignWorker(prev => (prev ? { ...prev, Role: value } : null));
+                            validateField("Role", value);
+                        }
                     }
+                    error={Boolean(validationError.Role)}
+                    helperText={validationError.Role}
+                    required
                     fullWidth
                 >
                     <MenuItem value="CEO">CEO</MenuItem>
@@ -89,11 +119,19 @@ if (!workerId || !farmId) return <Alert severity="warning">Missing worker id or 
 
                 <TextField
                     type="date"
+                    name="CertifiedUntil"
                     label="Certified Until"
                     value={assignWorker.CertifiedUntil}
-                    onChange={(e) =>
-                        setAssignWorker((prev) => prev ? { ...prev, CertifiedUntil: e.target.value } : null)
+                    onChange={
+                        (e) => {
+                            const value = e.target.value;
+                            setAssignWorker(prev => (prev ? { ...prev, CertifiedUntil: value } : null));
+                            validateField("CertifiedUntil", value);
+                        }
                     }
+                    error={Boolean(validationError.CertifiedUntil)}
+                    helperText={validationError.CertifiedUntil}
+                    required
                     InputLabelProps={{ shrink: true }}
                     fullWidth
                 />

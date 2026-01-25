@@ -28,7 +28,7 @@ export function WorkerEditForm(){
     type ValidationErrorType = Partial<Record<keyof WorkerSchema, string>>;
 
     const fields : FieldConfig[] = [
-        {key:"Name", label:"Farm Name", type:"text"},
+        {key:"Name", label:"Worker Name", type:"text"},
         {key:"Age", label:"Age", type:"number"},
         {key:"Email", label:"Email", type:"text"},
         {key:"Picture", label:"Picture", type:"file"},
@@ -52,7 +52,7 @@ export function WorkerEditForm(){
         } else {
             setValidationError(prev => ({
                 ...prev,
-                [key]: ErrorMessage({path: [String(field.error.issues[0].path[0])], message: field.error.issues[0].message})
+                [key]: ErrorMessage({path: [String(key)], message: field.error.issues[0].message})
             }));
         }
     }
@@ -109,10 +109,15 @@ export function WorkerEditForm(){
         })
         setValidationError({});
         } else {
-            setValidationError(prev => ({
-                ...prev,
-                [String(result.error.issues[0].path[0])]: ErrorMessage({path: [String(result.error.issues[0].path[0])], message: result.error.issues[0].message})
-            }));
+            const errors: ValidationErrorType = {};
+            for (const issue of result.error.issues) {
+                const key = issue.path[0] as keyof WorkerSchema;
+                errors[key] = ErrorMessage({
+                path: [String(key)],
+                message: issue.message,
+                });
+            }
+            setValidationError(errors);
         }
     }
 

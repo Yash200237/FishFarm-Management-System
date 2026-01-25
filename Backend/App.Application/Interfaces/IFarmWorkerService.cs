@@ -11,6 +11,7 @@ namespace App.Application.Interfaces
         Task RemoveWorker(Guid WorkerId, Guid FarmId);  //remove worker from farm
         Task<IEnumerable<WorkerResponseDto>> GetUnassignedWorkers(Guid orgId);
         Task<IEnumerable<FarmResponseDto>> GetFarmsUnassignedForWorker(Guid orgId, Guid workerId);
+        Task<IEnumerable<FarmWorkerDto>> GetExpiredFarmWorkers(Guid orgId);
         Task<WorkerToFarmDto> GetFarmWorkerByIdAsync(Guid workerId, Guid farmId);
         Task<IEnumerable<WorkerResponseDto>> GetFarmWorkersUnassigned(Guid orgId, Guid farmId);
 

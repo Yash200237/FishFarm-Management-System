@@ -94,7 +94,7 @@ export function FarmEditForm(){
         } else {
             setValidationError(prev => ({
                 ...prev,
-                [key]: ErrorMessage({path: [String(field.error.issues[0].path[0])], message: field.error.issues[0].message})
+                [key]: ErrorMessage({path: [String(key)], message: field.error.issues[0].message})
             }));
         }
     }
@@ -120,7 +120,7 @@ export function FarmEditForm(){
     const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) =>{
         const {name,type,value,checked} = e.target;
         const key = name as keyof FarmSchema;
-                const typedValue = type === "checkbox"? checked 
+        const typedValue = type === "checkbox"? checked 
                  : type === "number" ? key === "NoOfCages"? parseInt(value) || 1 
                                      : key === "Longitude" || key === "Latitude" ? round4(Number(value))          
                                      : Number(value) 
@@ -142,10 +142,15 @@ export function FarmEditForm(){
         })
         }
         else {
-            setValidationError(prev => ({
-                ...prev,
-                [String(result.error.issues[0].path[0])]: ErrorMessage({path: [String(result.error.issues[0].path[0])], message: result.error.issues[0].message})
-            }));        }
+        const errors: ValidationErrorType = {};
+        for (const issue of result.error.issues) {
+            const key = issue.path[0] as keyof FarmSchema;
+            errors[key] = ErrorMessage({
+            path: [String(key)],
+            message: issue.message,
+            });
+        }
+        setValidationError(errors);       }
     }
 
     const renderField = (field: FieldConfig) => {

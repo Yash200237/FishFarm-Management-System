@@ -16,11 +16,14 @@ import MenuItem from '@mui/material/MenuItem'
 import { assignSchema, type AssignSchema } from "../schemas/workerSchemas";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import { StyledEditBox } from "../styles/Common.styles";
+import { ErrorMessage } from "../components/ErrorMessage";
 
 export const WorkerAssignPage = () => {
+    type ValidationErrorType = Partial<Record<keyof AssignSchema, string>>;
+    
     const {workerId} = useParams<{workerId: string}>();
     const navigate = useNavigate();
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [validationError, setValidationError] = useState<ValidationErrorType>({});
     const [assignWorker, setAssignWorker] = useState<AssignSchema>({
         WorkerId: workerId || "",
         FarmId: "",
@@ -32,18 +35,54 @@ export const WorkerAssignPage = () => {
             navigate(`/workers/${workerId}`)
         },
     })  
-    const {isLoading,isError,data:farms,error} = useQuery(['UnassignedFarms', workerId], () => fetchFarmsNotAssigned(workerId!));
+
+    const validateField = (key : keyof AssignSchema, value: AssignSchema[keyof AssignSchema]) =>{
+        const field = assignSchema.shape[key].safeParse(value);
+        if(field.success){
+            setValidationError(prev => {
+                const newErrors = {...prev};
+                delete newErrors[key];
+                return newErrors;
+            });
+        } else {
+            setValidationError(prev => ({
+                ...prev,
+                [key]: ErrorMessage({path: [String(key)], message: field.error.issues[0].message})
+            }));
+        }
+    }
+
+    const {isLoading,isError,data:farms,error} = useQuery(['UnassignedFarms', workerId], () => fetchFarmsNotAssigned(workerId!), { enabled: !!workerId });
     if (!workerId) return <Alert severity="warning">Missing worker id</Alert>
     if(isLoading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>;
-    if(isError) return <Alert severity="error">{error instanceof Error ? error.message : 'An error occurred'}</Alert>;      
+    if(isError) return <Alert severity="error">{error instanceof Error ? error.message : 'An error occurred'}</Alert>;  
 
+    const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) =>{
+        const {name,value} = e.target;
+        const key = name as keyof AssignSchema;
+        setAssignWorker(prev =>({
+            ...prev,
+            [key]: value
+        }))
+
+        validateField(key,value as AssignSchema[keyof AssignSchema]);
+    }
+    
     const handleOnClick = () => {
         const result = assignSchema.safeParse(assignWorker);
         if(result.success){
+            setValidationError({});
             createAssignmentMutation.mutate(assignWorker)}
         else {
-            setErrorMessage(result.error.issues[0].path + " : " + result.error.issues[0].message);
-        }
+            const errors: ValidationErrorType = {};
+                        for (const issue of result.error.issues) {
+                            const key = issue.path[0] as keyof AssignSchema;
+                            errors[key] = ErrorMessage({
+                            path: [String(key)],
+                            message: issue.message,
+                            });
+                        }
+              setValidationError(errors);        }
     }
 
   return (
@@ -55,19 +94,15 @@ export const WorkerAssignPage = () => {
 
             <StyledEditBox>
 
-                {errorMessage && (
-                    <Alert severity="error">
-                        {errorMessage}
-                    </Alert>
-                )}
-
                 <TextField
                     select
+                    name = "Role"
                     label="Role"
                     value={assignWorker.Role}
-                    onChange={(e) =>
-                        setAssignWorker((prev) => ({ ...prev, Role: e.target.value as AssignSchema["Role"] }))
-                    }
+                    onChange={handleChangeInput}
+                    error={Boolean(validationError.Role)}
+                    helperText={validationError.Role}
+                    required
                     fullWidth
                 >
                     <MenuItem value="CEO">CEO</MenuItem>
@@ -77,15 +112,16 @@ export const WorkerAssignPage = () => {
 
                 <TextField
                     select
+                    name = "FarmId"
                     label="Select Farm"
                     value={assignWorker.FarmId}
-                    onChange={(e) =>
-                        setAssignWorker((prev) => ({ ...prev, FarmId: e.target.value }))
-                    }
+                    onChange={handleChangeInput}
                     fullWidth
+                    error={Boolean(validationError.FarmId)}
+                    helperText={validationError.FarmId}
                     required
                 >
-                    <MenuItem value="">-- Select a farm --</MenuItem>
+                    <MenuItem value="" disabled>-- Select a farm --</MenuItem>
                     {farms?.map((farm: FarmResponse) => (
                         <MenuItem key={farm.farmId} value={farm.farmId}>{farm.name}</MenuItem>
                     ))}
@@ -93,11 +129,13 @@ export const WorkerAssignPage = () => {
 
                 <TextField
                     type="date"
+                    name="CertifiedUntil"
                     label="Certified Until"
                     value={assignWorker.CertifiedUntil}
-                    onChange={(e) =>
-                        setAssignWorker((prev) => ({ ...prev, CertifiedUntil: e.target.value}))
-                    }
+                    onChange={handleChangeInput}
+                    error={Boolean(validationError.CertifiedUntil)}
+                    helperText={validationError.CertifiedUntil}
+                    required
                     InputLabelProps={{ shrink: true }}
                     fullWidth
                 />

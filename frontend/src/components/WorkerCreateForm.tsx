@@ -59,7 +59,7 @@ export function WorkerCreateForm(){
         } else {
             setValidationError(prev => ({
                 ...prev,
-                [key]: ErrorMessage({path: [String(field.error.issues[0].path[0])], message: field.error.issues[0].message})
+                [key]: ErrorMessage({path: [String(key)], message: field.error.issues[0].message})
             }));
         }
     }
@@ -85,16 +85,21 @@ export function WorkerCreateForm(){
             await createWorkerMutation.mutateAsync(worker);
             setWorker({
                 Name: "",
-                Age: 0,
+                Age: 1,
                 Email: "",
                 Phone: "",
             })
             setValidationError({});
         } else {
-            setValidationError(prev => ({
-                ...prev,
-                [String(result.error.issues[0].path[0])]: ErrorMessage({path: [String(result.error.issues[0].path[0])], message: result.error.issues[0].message})
-            }));
+            const errors: ValidationErrorType = {};
+            for (const issue of result.error.issues) {
+                const key = issue.path[0] as keyof WorkerSchema;
+                errors[key] = ErrorMessage({
+                path: [String(key)],
+                message: issue.message,
+                });
+            }
+            setValidationError(errors);
         }
     }
 

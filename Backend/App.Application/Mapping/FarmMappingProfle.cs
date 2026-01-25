@@ -21,6 +21,13 @@ namespace App.Application.Mapping
             CreateMap<FarmWorker, FarmWDetailsDto>()
                     .ForMember(dest => dest.FarmName,
                                opt => opt.MapFrom(src => src.Farm.Name));
+            CreateMap<FarmWorker, FarmWorkerDto>()
+                    .ForMember(dest => dest.FarmName,
+                               opt => opt.MapFrom(src => src.Farm.Name))
+                    .ForMember(dest => dest.WorkerName,
+                               opt => opt.MapFrom(src => src.Worker.Name))
+                    .ForMember(dest => dest.WorkerEmail,
+                               opt => opt.MapFrom(src => src.Worker.Email));
 
         }
     }

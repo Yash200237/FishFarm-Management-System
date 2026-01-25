@@ -11,6 +11,7 @@ namespace App.Domain.Interfaces
         Task<IEnumerable<FarmWorker>> GetFarmsForWorkerId(Guid workerId);
         Task<IEnumerable<FarmWorker>> GetWorkersForFarmId(Guid farmId);
         Task<IEnumerable<Worker>> GetWorkersUnassigned(Guid orgId);
+        Task<IEnumerable<FarmWorker>> GetExpiredWorkers(Guid orgId);
         Task<IEnumerable<Farm>> GetFarmsUnassignedToWorker(Guid orgId, Guid workerId);
         Task<IEnumerable<Worker>> GetWorkersUnassignedToFarm(Guid orgId, Guid farmId);
 

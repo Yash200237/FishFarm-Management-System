@@ -2,7 +2,7 @@ import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Paper from '@mui/material/Paper';
-import { CardContent, ListItem, Typography } from '@mui/material';
+import { CardContent, ListItem, TableCell, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 export const PageContainer = styled(Box)({
@@ -90,7 +90,7 @@ export const ChipContainer= styled(Box)(({theme}) => ({
 
 export const StyledContainerBar= styled(Box)(({theme}) => ({
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'right',
   gap: theme.spacing(2)
 }));
 
@@ -108,3 +108,9 @@ export const StyledEditBox = styled(Box)(({ theme }) => ({
   gap: theme.spacing(2),
   marginTop: theme.spacing(3),
 })); 
+
+export const ModifiedCell = styled(TableCell)(({ theme }) => ({
+  fontWeight: 'bold',
+  backgroundColor: alpha(theme.palette.primary.main, 0.1),
+
+}));

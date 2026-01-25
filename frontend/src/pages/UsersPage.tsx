@@ -7,7 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Alert from '@mui/material/Alert'
 import Fab from '@mui/material/Fab'
 import AddIcon from '@mui/icons-material/Add'
-import { PageContainer, StyledContainerBar, StyledHeading, StyledHeadingBar, StyledListItem } from '../styles/Common.styles.ts'
+import {ModifiedCell, PageContainer, StyledContainerBar, StyledHeading, StyledHeadingBar, StyledListItem } from '../styles/Common.styles.ts'
 import { SectionContainer } from '../styles/WorkersPage.styles.ts'
 import type { AxiosError } from "axios";
 import { ProtectedWrapper } from "../components/ProtectedWrapper.tsx";
@@ -22,8 +22,6 @@ import Paper from '@mui/material/Paper';
 import { useState } from "react";
 import { DeleteAlertDialog } from "../components/DeleteAlertDialog";
 import { SearchBar } from "../components/SearchBar.tsx";
-import { StyledTableCell } from "../styles/UsersPage.styles.ts";
-
 
 export function UsersPage() {
   const navigate = useNavigate();
@@ -140,13 +138,13 @@ export function UsersPage() {
         <Alert severity="info">No users available. Please create a new user.</Alert>
       ) : (
       <TableContainer component={Paper} sx={{maxHeight: 350, mt:4}}>
-            <Table aria-label="users table" stickyHeader>
+            <Table aria-label="users table" stickyHeader size="small">
               <TableHead>
                 <TableRow >
-                  <StyledTableCell scope="col" >Name</StyledTableCell>
-                  <StyledTableCell scope="col">Email</StyledTableCell>
-                  <StyledTableCell scope="col">Username</StyledTableCell>
-                  <StyledTableCell scope="col" >Actions</StyledTableCell>
+                  <ModifiedCell scope="col" >Name</ModifiedCell>
+                  <ModifiedCell scope="col">Email</ModifiedCell>
+                  <ModifiedCell scope="col">Username</ModifiedCell>
+                  <ModifiedCell scope="col" align="center" >Actions</ModifiedCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -157,7 +155,7 @@ export function UsersPage() {
                     </TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.userName}</TableCell>
-                    <TableCell >
+                    <TableCell>
                     <StyledContainerBar>
                     <Button 
                       size="small" 
